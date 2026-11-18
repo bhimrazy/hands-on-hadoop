@@ -1,0 +1,13 @@
+# Use with: docker compose -f compose.yaml -f labs/10-tuning-yarn/compose.override-example.yaml up -d --no-deps --force-recreate resourcemanager
+services:
+  resourcemanager:
+    environment:
+      # The image writes capacity-scheduler.xml from these variables alone, so every queue property must be listed.
+      CAPACITY-SCHEDULER.XML_yarn.scheduler.capacity.root.queues: default,batch
+      CAPACITY-SCHEDULER.XML_yarn.scheduler.capacity.root.default.capacity: "50"
+      CAPACITY-SCHEDULER.XML_yarn.scheduler.capacity.root.default.maximum-capacity: "100"
+      CAPACITY-SCHEDULER.XML_yarn.scheduler.capacity.root.batch.capacity: "50"
+      CAPACITY-SCHEDULER.XML_yarn.scheduler.capacity.root.batch.maximum-capacity: "100"
+      # With 1, one user is capped at the queue's own 50%, which is less than one 384 MB ApplicationMaster plus a map.
+      CAPACITY-SCHEDULER.XML_yarn.scheduler.capacity.root.default.user-limit-factor: "2"
+      CAPACITY-SCHEDULER.XML_yarn.scheduler.capacity.root.batch.user-limit-factor: "2"

@@ -1,0 +1,6 @@
+hadoop stores data in hdfs
+yarn runs jobs on hadoop
+kafka moves data in streams
+spark reads streams from kafka
+hdfs keeps the streamed data
+streams of data never stop
