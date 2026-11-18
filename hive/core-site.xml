@@ -1,0 +1,6 @@
+<?xml version="1.0"?>
+<configuration>
+  <property><name>fs.defaultFS</name><value>hdfs://namenode:8020</value></property>
+  <!-- Hive's config carries no hdfs-site.xml, so without this its files get the client default of 3 copies. -->
+  <property><name>dfs.replication</name><value>1</value></property>
+</configuration>

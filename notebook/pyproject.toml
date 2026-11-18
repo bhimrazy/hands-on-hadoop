@@ -1,0 +1,18 @@
+[project]
+name = "hands-on-hadoop-notebook"
+version = "0.1.0"
+requires-python = "==3.10.*"
+dependencies = [
+    "jupyterlab",
+    "matplotlib",
+    "pandas",
+    # Lets %pip install work inside notebooks.
+    "pip",
+    "pyarrow",
+    "seaborn",
+]
+
+[tool.uv]
+package = false
+# Only resolve releases at least a week old.
+exclude-newer = "7 days"

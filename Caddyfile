@@ -1,0 +1,46 @@
+{
+	auto_https off
+}
+
+http://hdfs.localhost {
+	reverse_proxy namenode:9870
+}
+
+http://dn1.localhost {
+	reverse_proxy datanode:80
+}
+
+http://dn2.localhost {
+	reverse_proxy datanode2:80
+}
+
+http://dn3.localhost {
+	reverse_proxy datanode3:80
+}
+
+http://yarn.localhost {
+	reverse_proxy resourcemanager:80
+}
+
+http://nodemanager.localhost {
+	reverse_proxy nodemanager:80
+}
+
+http://history.localhost {
+	reverse_proxy historyserver:80
+}
+
+http://jupyter.localhost {
+	reverse_proxy notebook:8888
+}
+
+http://spark.localhost {
+	reverse_proxy notebook:4040
+}
+
+http://hive.localhost {
+	# The HiveServer2 UI picks its handler by the port in the Host header, so send the upstream's.
+	reverse_proxy hiveserver2:10002 {
+		header_up Host {upstream_hostport}
+	}
+}

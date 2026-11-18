@@ -1,0 +1,315 @@
+name: hands-on-hadoop
+
+# Official Apache images are amd64-only; on Apple Silicon they run under Docker Desktop's emulation.
+x-hadoop: &hadoop
+  image: apache/hadoop:3.4.2-lean@sha256:27eb85ba5765b79fd0cde5a245579a3c5ab93799016a44dd0c447a13e64cb790
+  platform: linux/amd64
+  # Heap is capped at 256m; the rest covers JVM overhead.
+  deploy:
+    resources:
+      limits:
+        memory: 384m
+  # The image turns each <FILE>.XML_<property> variable into a <property> in that Hadoop config file at startup.
+  environment: &hadoop-env
+    HADOOP_HEAPSIZE_MAX: 256m
+
+    # core-site.xml: where clients find HDFS.
+    CORE-SITE.XML_fs.defaultFS: hdfs://namenode:8020
+    # The user the web UIs act as.
+    CORE-SITE.XML_hadoop.http.staticuser.user: hadoop
+
+    # hdfs-site.xml: storage. Both folders live on Docker volumes, so data is kept between runs.
+    HDFS-SITE.XML_dfs.namenode.name.dir: /data/namenode
+    HDFS-SITE.XML_dfs.datanode.data.dir: /data/datanode
+    # One DataNode by default, so keep one copy of each block. Lab 04 asks for more per file.
+    HDFS-SITE.XML_dfs.replication: "1"
+    # Lets notebook and lab users write anywhere in HDFS without chown steps.
+    HDFS-SITE.XML_dfs.permissions.enabled: "false"
+    # Leave safe mode 5 s after enough blocks are reported (default 30 s).
+    HDFS-SITE.XML_dfs.namenode.safemode.extension: "5000"
+    # Declare a DataNode dead after 2 x 30 s + 10 heartbeats (~90 s) instead of 10.5 minutes.
+    HDFS-SITE.XML_dfs.namenode.heartbeat.recheck-interval: "30000"
+    # Port 80 so the NameNode's download redirect (http://dnN.localhost:80/...) lands on the proxy in the browser.
+    HDFS-SITE.XML_dfs.datanode.http.address: 0.0.0.0:80
+
+    # yarn-site.xml: compute. The NodeManager offers 768 MB and 2 cores to jobs.
+    YARN-SITE.XML_yarn.resourcemanager.hostname: resourcemanager
+    # Runs the shuffle between map and reduce tasks.
+    YARN-SITE.XML_yarn.nodemanager.aux-services: mapreduce_shuffle
+    YARN-SITE.XML_yarn.nodemanager.resource.memory-mb: "768"
+    YARN-SITE.XML_yarn.nodemanager.resource.cpu-vcores: "2"
+    YARN-SITE.XML_yarn.scheduler.minimum-allocation-mb: "128"
+    YARN-SITE.XML_yarn.scheduler.maximum-allocation-mb: "768"
+    # JVMs reserve far more virtual memory than they use; this check would kill them for it.
+    YARN-SITE.XML_yarn.nodemanager.vmem-check-enabled: "false"
+
+    # mapred-site.xml: run MapReduce on YARN with task sizes that fit in 768 MB.
+    MAPRED-SITE.XML_mapreduce.framework.name: yarn
+    # Tells job containers where the MapReduce jars are.
+    MAPRED-SITE.XML_yarn.app.mapreduce.am.env: HADOOP_MAPRED_HOME=/opt/hadoop
+    MAPRED-SITE.XML_mapreduce.map.env: HADOOP_MAPRED_HOME=/opt/hadoop
+    MAPRED-SITE.XML_mapreduce.reduce.env: HADOOP_MAPRED_HOME=/opt/hadoop
+    # ApplicationMaster: the per-job coordinator. Heap (-Xmx) is about 75-80% of each container's memory.
+    MAPRED-SITE.XML_yarn.app.mapreduce.am.resource.mb: "384"
+    MAPRED-SITE.XML_yarn.app.mapreduce.am.command-opts: -Xmx288m
+    MAPRED-SITE.XML_mapreduce.map.memory.mb: "256"
+    MAPRED-SITE.XML_mapreduce.map.java.opts: -Xmx200m
+    MAPRED-SITE.XML_mapreduce.reduce.memory.mb: "256"
+    MAPRED-SITE.XML_mapreduce.reduce.java.opts: -Xmx200m
+
+    # Web UIs listen on port 80 and advertise *.localhost names. Each name is a network alias of its
+    # container, so it resolves to the container inside Docker and to 127.0.0.1 (the proxy) in the
+    # browser, which makes every absolute link the UIs generate work in both places.
+    YARN-SITE.XML_yarn.resourcemanager.webapp.address: yarn.localhost:80
+    # The NodeManager names itself after its container hostname, which the service sets to nodemanager.localhost.
+    YARN-SITE.XML_yarn.nodemanager.webapp.address: 0.0.0.0:80
+    # Finished containers' logs are copied into HDFS, so `yarn logs` works after a job ends.
+    YARN-SITE.XML_yarn.log-aggregation-enable: "true"
+    YARN-SITE.XML_yarn.nodemanager.remote-app-log-dir: /app-logs
+    # JobHistory server (history profile). Jobs build their "History" link from this RPC host plus the web port.
+    MAPRED-SITE.XML_mapreduce.jobhistory.address: history.localhost:10020
+    MAPRED-SITE.XML_mapreduce.jobhistory.webapp.address: history.localhost:80
+    YARN-SITE.XML_yarn.log.server.url: http://history.localhost/jobhistory/logs
+
+# Named volumes mount root-owned; hand /data to the hadoop user before starting the daemon.
+x-datanode: &datanode
+  <<: *hadoop
+  entrypoint: ["bash", "-c", "sudo chown hadoop:users /data && exec /opt/starter.sh hdfs datanode"]
+  # Not service_healthy: on a warm start the NameNode stays in safe mode until a DataNode reports in.
+  depends_on:
+    - namenode
+
+x-small-datanode: &small-datanode
+  <<: *datanode
+  profiles: [cluster]
+  deploy:
+    resources:
+      limits:
+        memory: 256m
+
+services:
+  namenode:
+    <<: *hadoop
+    hostname: namenode
+    # Formats HDFS on first boot only (ENSURE_NAMENODE_DIR).
+    entrypoint: ["bash", "-c", "sudo chown hadoop:users /data && exec /opt/starter.sh hdfs namenode"]
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    environment:
+      <<: *hadoop-env
+      ENSURE_NAMENODE_DIR: /data/namenode
+    volumes:
+      - namenode:/data
+      - ./labs:/labs:ro
+      - ./workspace:/workspace
+    working_dir: /workspace
+    # Healthy only once HDFS is writable: out of safe mode with at least one live DataNode.
+    # The trailing grep matters: jq exits 0 on empty input when curl fails.
+    healthcheck:
+      test: ["CMD-SHELL", "curl -sf 'http://localhost:9870/jmx?qry=Hadoop:service=NameNode,name=FSNamesystemState' | jq -e '.beans[0] | .FSState == \"Operational\" and .NumLiveDataNodes > 0' | grep -q true"]
+      interval: 5s
+      start_period: 120s
+      start_interval: 2s
+      retries: 30
+
+  datanode:
+    <<: *datanode
+    hostname: datanode
+    environment:
+      <<: *hadoop-env
+      # The NameNode UI sends browsers to this name for downloads; the proxy routes it to this container.
+      HDFS-SITE.XML_dfs.datanode.hostname: dn1.localhost
+    networks:
+      default:
+        aliases: [dn1.localhost]
+    volumes:
+      - datanode:/data
+
+  datanode2:
+    <<: *small-datanode
+    hostname: datanode2
+    environment:
+      <<: *hadoop-env
+      HADOOP_HEAPSIZE_MAX: 128m
+      HDFS-SITE.XML_dfs.datanode.hostname: dn2.localhost
+    networks:
+      default:
+        aliases: [dn2.localhost]
+    volumes:
+      - datanode2:/data
+
+  datanode3:
+    <<: *small-datanode
+    hostname: datanode3
+    environment:
+      <<: *hadoop-env
+      HADOOP_HEAPSIZE_MAX: 128m
+      HDFS-SITE.XML_dfs.datanode.hostname: dn3.localhost
+    networks:
+      default:
+        aliases: [dn3.localhost]
+    volumes:
+      - datanode3:/data
+
+  resourcemanager:
+    <<: *hadoop
+    hostname: resourcemanager
+    command: ["yarn", "resourcemanager"]
+    networks:
+      default:
+        aliases: [yarn.localhost]
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    depends_on:
+      namenode:
+        condition: service_healthy
+
+  nodemanager:
+    <<: *hadoop
+    # Sets the name the NodeManager registers with, and so every log link it hands out.
+    hostname: nodemanager.localhost
+    command: ["yarn", "nodemanager"]
+    networks:
+      default:
+        aliases: [nodemanager.localhost]
+    # Map/reduce task JVMs run inside this container: daemon plus the 768 MB YARN hands out.
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    depends_on:
+      - resourcemanager
+
+  historyserver:
+    <<: *hadoop
+    profiles: [history]
+    hostname: historyserver
+    command: ["mapred", "historyserver"]
+    networks:
+      default:
+        aliases: [history.localhost]
+    depends_on:
+      namenode:
+        condition: service_healthy
+
+  notebook:
+    # Official Spark image plus JupyterLab, pandas, matplotlib, seaborn and the Kafka and Iceberg jars;
+    # see notebook/Dockerfile. Spark runs in local mode here, not on YARN (Java 21 vs the Hadoop image's 11).
+    build: ./notebook
+    image: hands-on-hadoop-notebook
+    profiles: [notebook]
+    hostname: notebook
+    deploy:
+      resources:
+        limits:
+          memory: 1536m
+    # Jupyter has no login token: it is only reachable through the proxy, which listens on localhost.
+    # Jupyter's root is /workspace; learners copy lab notebooks there so the repo copies stay clean.
+    volumes:
+      - ./labs:/labs:ro
+      - ./workspace:/workspace
+    healthcheck:
+      test: ["CMD", "curl", "-sf", "http://localhost:8888/api"]
+      interval: 5s
+      start_period: 30s
+      retries: 20
+    depends_on:
+      namenode:
+        condition: service_healthy
+
+  hiveserver2:
+    # Native arm64 + amd64. HiveServer2 with an embedded Derby metastore; queries run as Tez in local
+    # mode inside this container, not on YARN (Hive 4 needs Java 21, the Hadoop image has 11).
+    image: apache/hive:4.2.1@sha256:b19bb5bd01f233a3f99d941ebf08acaff68c55911dd5fa42ea03928e51860b91
+    profiles: [hive]
+    hostname: hiveserver2
+    # The image has no sudo; start as root only to hand the Derby volume to the hive user.
+    user: root
+    entrypoint: ["bash", "-c", "chown hive:hive /opt/hive/derby && exec su hive -s /bin/bash -c /entrypoint.sh"]
+    deploy:
+      resources:
+        limits:
+          memory: 1g
+    environment:
+      SERVICE_NAME: hiveserver2
+      # Overrides the image's -Xmx1G (later flag wins); Derby creates metastore_db under derby.system.home.
+      # doAs off: queries touch HDFS as the hive user, so no proxy-user setup is needed on the NameNode.
+      SERVICE_OPTS: -Xmx512m -Dderby.system.home=/opt/hive/derby -Dhive.server2.enable.doAs=false
+      DEFAULT_FS: hdfs://namenode:8020
+      HIVE_WAREHOUSE_PATH: /user/hive/warehouse
+      HIVE_SCRATCH_DIR: /tmp/hive
+      # Files here are linked over the generated config: HDFS address and replication 1.
+      HIVE_CUSTOM_CONF_DIR: /hive-conf
+    volumes:
+      - ./hive:/hive-conf:ro
+      # Table definitions survive `docker compose down`; Derby will not create its DB in an empty mount point.
+      - hive-metastore:/opt/hive/derby
+      - ./labs:/labs:ro
+      - ./workspace:/workspace
+    healthcheck:
+      test: ["CMD-SHELL", "bash -c '</dev/tcp/localhost/10000'"]
+      interval: 5s
+      start_period: 180s
+      retries: 40
+    depends_on:
+      namenode:
+        condition: service_healthy
+
+  kafka:
+    # Native arm64 + amd64. One broker that is also its own KRaft controller (no ZooKeeper).
+    image: apache/kafka:4.4.0@sha256:833b867a9585a141da455dc2b57431c65cbccb27f11c91f694444cca9f777e0f
+    profiles: [kafka]
+    hostname: kafka
+    deploy:
+      resources:
+        limits:
+          memory: 512m
+    environment:
+      KAFKA_HEAP_OPTS: -Xmx256m -Xms256m
+      KAFKA_NODE_ID: 1
+      KAFKA_PROCESS_ROLES: broker,controller
+      KAFKA_LISTENERS: PLAINTEXT://:9092,CONTROLLER://:9093
+      KAFKA_ADVERTISED_LISTENERS: PLAINTEXT://kafka:9092
+      KAFKA_CONTROLLER_LISTENER_NAMES: CONTROLLER
+      KAFKA_LISTENER_SECURITY_PROTOCOL_MAP: CONTROLLER:PLAINTEXT,PLAINTEXT:PLAINTEXT
+      KAFKA_CONTROLLER_QUORUM_VOTERS: 1@kafka:9093
+      # Single broker: internal topics can only have one replica.
+      KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_REPLICATION_FACTOR: 1
+      KAFKA_TRANSACTION_STATE_LOG_MIN_ISR: 1
+      KAFKA_GROUP_INITIAL_REBALANCE_DELAY_MS: 0
+      KAFKA_NUM_PARTITIONS: 1
+      KAFKA_LOG_DIRS: /var/lib/kafka/data
+    volumes:
+      - kafka:/var/lib/kafka/data
+      - ./labs:/labs:ro
+      - ./workspace:/workspace
+    healthcheck:
+      test: ["CMD-SHELL", "/opt/kafka/bin/kafka-broker-api-versions.sh --bootstrap-server localhost:9092 >/dev/null 2>&1"]
+      interval: 10s
+      start_period: 60s
+      retries: 20
+
+  proxy:
+    # Serves every web UI at http://<name>.localhost; see Caddyfile.
+    image: caddy:2.11.8-alpine@sha256:f6228111e5fafa1a5238258d0858e103f10599b8d1659a146e7726681a002bb9
+    deploy:
+      resources:
+        limits:
+          memory: 64m
+    ports:
+      - "127.0.0.1:80:80"
+    volumes:
+      - ./Caddyfile:/etc/caddy/Caddyfile:ro
+
+volumes:
+  namenode:
+  datanode:
+  datanode2:
+  datanode3:
+  hive-metastore:
+  kafka:

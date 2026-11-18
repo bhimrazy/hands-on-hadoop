@@ -1,0 +1,15 @@
+workspace/*
+!workspace/.gitkeep
+
+.ipynb_checkpoints/
+__pycache__/
+*.pyc
+
+.env
+.env.*
+
+.DS_Store
+Thumbs.db
+.idea/
+.vscode/
+*.swp
