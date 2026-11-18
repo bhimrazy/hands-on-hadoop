@@ -1,6 +1,6 @@
-FROM ghcr.io/astral-sh/uv:0.11.8@sha256:3b7b60a81d3c57ef471703e5c83fd4aaa33abcd403596fb22ab07db85ae91347 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.9@sha256:d3b601f0c7b118bc1753febf7c41cc80981df678445e0254284eecf84db79a7d AS uv
 
-FROM spark:4.1.3-python3@sha256:23b155b98033eae36e503b11f613e2091caf30722a599521965925dc2756460a
+FROM spark:4.2.0-python3@sha256:fe093500805bd3c4784edae4a74e6ada1ebed37cc2e32d292ffb048800eda6df
 
 COPY --from=uv /uv /usr/local/bin/uv
 
