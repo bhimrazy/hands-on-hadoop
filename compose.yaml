@@ -109,8 +109,9 @@ services:
     # The trailing grep matters: jq exits 0 on empty input when curl fails.
     healthcheck:
       test: ["CMD-SHELL", "curl -sf 'http://localhost:9870/jmx?qry=Hadoop:service=NameNode,name=FSNamesystemState' | jq -e '.beans[0] | .FSState == \"Operational\" and .NumLiveDataNodes > 0' | grep -q true"]
+      # Emulated amd64 (QEMU, slow laptops) can take minutes to start the NameNode; a fast start still turns healthy in seconds.
       interval: 5s
-      start_period: 120s
+      start_period: 300s
       start_interval: 2s
       retries: 30
 
