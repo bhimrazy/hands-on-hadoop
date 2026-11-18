@@ -14,8 +14,9 @@ hdfs dfs -rm -r -f /lab02/out-java /lab02/out-python
 hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.jar \
   wordcount /lab02/input /lab02/out-java
 
-if hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.jar \
-  wordcount /lab02/input /lab02/out-java 2>&1 | grep -q "already exists"; then
+rerun=$(hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.jar \
+  wordcount /lab02/input /lab02/out-java 2>&1 || true)
+if grep -q "already exists" <<<"$rerun"; then
   echo "rerun failed as expected"
 else
   echo "expected output-exists error" >&2
