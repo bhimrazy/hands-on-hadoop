@@ -1,0 +1,4 @@
+hadoop stores big files by cutting them into blocks
+each block is copied to more than one machine
+the namenode remembers which blocks belong to which file
+the datanodes hold the blocks themselves

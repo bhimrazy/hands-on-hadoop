@@ -1,0 +1,3 @@
+logs tell you what a job did
+logs tell you why a job failed
+a good engineer reads the logs first

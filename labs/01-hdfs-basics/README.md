@@ -1,0 +1,243 @@
+# Lab 01: HDFS basics
+
+Put a file into HDFS, see how it is cut into blocks, and learn to read the cluster from both the shell and the web UI.
+
+| | |
+|---|---|
+| ⏱ Time | 30 minutes |
+| 🧠 Docker memory | about 1.5 GB |
+| 🧩 Services | `namenode`, `datanode`, `proxy` (the core stack) |
+| Level | Beginner |
+
+HDFS stores big files by cutting them into **blocks**. The **NameNode** remembers which blocks make up each file. The **DataNodes** keep the blocks.
+
+<img src="../../images/hdfs-write.svg" alt="A file is split into blocks, each block is stored on DataNodes, and the NameNode keeps the metadata" width="720">
+
+## Start
+
+From the repo root:
+
+```bash
+docker compose up -d --wait
+```
+
+Check it is up: open <http://hdfs.localhost>. The page should say **active** and **Safemode is off**.
+
+Then open a shell inside the `namenode` container. Every command below runs there.
+
+```bash
+docker compose exec namenode bash
+```
+
+## Steps
+
+### 1. Wait for HDFS to be writable
+
+Right after startup, HDFS is read-only for a few seconds. This is **safe mode**. This command returns once it is over.
+
+```bash
+hdfs dfsadmin -safemode wait
+```
+
+You should see:
+
+```
+Safe mode is OFF
+```
+
+### 2. Make a folder and upload a file
+
+`/lab01` is a folder in HDFS. It is not a folder on your laptop. The repo's `labs/` folder is mounted at `/labs`, so you can upload from there.
+
+```bash
+hdfs dfs -mkdir -p /lab01
+hdfs dfs -put /labs/01-hdfs-basics/data/sample.txt /lab01/
+hdfs dfs -ls /lab01
+```
+
+You should see:
+
+```
+Found 1 items
+-rw-r--r--   1 hadoop supergroup        196 2026-11-18 10:02 /lab01/sample.txt
+```
+
+The `1` after the permissions is the **replication factor**: one copy of each block, because this stack has one DataNode. Lab 04 uses more.
+
+### 3. Read it back
+
+```bash
+hdfs dfs -cat /lab01/sample.txt
+hdfs dfs -get /lab01/sample.txt /workspace/sample-copy.txt
+```
+
+You should see the four lines of text. The second command copies the file out of HDFS into `workspace/` on your laptop.
+
+### 4. Look at it in the web UI
+
+Open <http://hdfs.localhost>, then **Utilities > Browse the file system**. Click `lab01`, then `sample.txt`. A window shows the file's size, replication and **block ID**. It also has a **Head the file** button.
+
+This is the same data you just read in the shell. The shell and the UI both ask the NameNode.
+
+### 5. Make a file that needs more than one block
+
+The default block size is 128 MB, so a small file is always one block. To see blocks without a huge file, make a 2 MB file and ask HDFS for 1 MB blocks.
+
+```bash
+seq 1 400000 > /workspace/numbers.txt
+ls -lh /workspace/numbers.txt
+hdfs dfs -D dfs.blocksize=1m -put /workspace/numbers.txt /lab01/
+```
+
+You should see:
+
+```
+-rw-r--r-- 1 hadoop users 2.2M Nov 18 10:05 /workspace/numbers.txt
+```
+
+`-D dfs.blocksize=1m` changes the setting for this one command only.
+
+### 6. Count the blocks with fsck
+
+`fsck` asks the NameNode how a file is stored.
+
+```bash
+hdfs fsck /lab01/numbers.txt -files -blocks -locations
+```
+
+You should see (trimmed):
+
+```
+/lab01/numbers.txt 2288895 bytes, replicated: replication=1, 3 block(s):  OK
+0. BP-...:blk_..._1002 len=1048576 Live_repl=1 [DatanodeInfoWithStorage[...]]
+1. BP-...:blk_..._1002 len=1048576 Live_repl=1 [DatanodeInfoWithStorage[...]]
+2. BP-...:blk_..._1002 len=191743 Live_repl=1 [DatanodeInfoWithStorage[...]]
+...
+ Total blocks (validated):	3 (avg. block size 762965 B)
+ Minimally replicated blocks:	3 (100.0 %)
+ Under-replicated blocks:	0 (0.0 %)
+The filesystem under path '/lab01/numbers.txt' is HEALTHY
+```
+
+Three blocks: two full 1 MB blocks and a small last one. The last block only takes the space it needs.
+
+Open the file in the web UI again. The block list now has three entries.
+
+### 7. See what is using the space
+
+```bash
+hdfs dfs -ls -R /lab01
+hdfs dfs -du -h /lab01
+hdfs dfs -df -h /
+```
+
+You should see (sizes will differ a little):
+
+```
+-rw-r--r--   1 hadoop supergroup        196 ... /lab01/sample.txt
+-rw-r--r--   1 hadoop supergroup    2288895 ... /lab01/numbers.txt
+196    196    /lab01/sample.txt
+2.2 M  2.2 M  /lab01/numbers.txt
+Filesystem                  Size    Used  Available  Use%
+hdfs://namenode:8020  ...
+```
+
+`-du` prints two sizes: the file size, and the size including all replicas. They match here because replication is 1.
+
+## Check yourself
+
+```bash
+docker compose exec namenode bash /labs/01-hdfs-basics/check.sh
+```
+
+You should see:
+
+```
+PASS  sample.txt is in /lab01
+PASS  /lab01/sample.txt has the sample text
+PASS  numbers.txt is in /lab01
+PASS  numbers.txt is split into 3 blocks
+All 4 checks passed
+```
+
+## Break it on purpose
+
+**Upload the same file twice.**
+
+```bash
+hdfs dfs -put /labs/01-hdfs-basics/data/sample.txt /lab01/
+```
+
+You should see:
+
+```
+put: `/lab01/sample.txt': File exists
+```
+
+HDFS never overwrites by accident. Add `-f` to replace the file: `hdfs dfs -put -f ...`.
+
+**Read a path that is not there.**
+
+```bash
+hdfs dfs -cat /lab01/missing.txt
+```
+
+You should see:
+
+```
+cat: `/lab01/missing.txt': No such file or directory
+```
+
+Both messages come from the NameNode. It checks the path before any DataNode is asked for data.
+
+## Going further
+
+1. Find how many blocks a 5 MB file gets with `-D dfs.blocksize=2m`.
+
+   <details><summary>Solution</summary>
+
+   Three: 2 MB, 2 MB and 1 MB.
+
+   ```bash
+   seq 1 800000 > /workspace/five.txt
+   hdfs dfs -D dfs.blocksize=2m -put /workspace/five.txt /lab01/
+   hdfs fsck /lab01/five.txt -files -blocks | grep "Total blocks"
+   ```
+
+   </details>
+
+2. Remove everything you made in this lab, then confirm it is gone.
+
+   <details><summary>Solution</summary>
+
+   ```bash
+   hdfs dfs -rm -r /lab01
+   hdfs dfs -ls /
+   ```
+
+   With no trash configured the delete is immediate.
+
+   </details>
+
+3. Open <http://hdfs.localhost> and find the **Datanodes** tab. How much capacity does the DataNode report?
+
+## Troubleshooting
+
+| Symptom | Fix |
+|---|---|
+| `Name node is in safe mode` | HDFS just started. Run `hdfs dfsadmin -safemode wait`, then retry. |
+| `hdfs.localhost` does not load | Run `docker compose ps`. If `proxy` or `namenode` is not running, run `docker compose up -d --wait` again. |
+| `put: ... is less than the minimum block size` | The block size must be at least 1 MB. Use `-D dfs.blocksize=1m`. |
+| Download from the UI fails | Reload the page and try again. The link goes through `dn1.localhost`. |
+
+More in [docs/troubleshooting.md](../../docs/troubleshooting.md).
+
+## Clean up
+
+Leave the stack running for the next lab, or stop it. Your HDFS files stay either way.
+
+```bash
+docker compose --profile "*" down
+```
+
+Next: [Lab 02, YARN and MapReduce](../02-yarn-and-mapreduce/README.md).
