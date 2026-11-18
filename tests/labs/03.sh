@@ -18,10 +18,10 @@ APP=$(yarn application -list -appStates FINISHED 2>/dev/null | awk "/word count/
 echo "wordcount app: $APP"
 
 for i in $(seq 1 30); do
-  yarn logs -applicationId "$APP" 2>/dev/null | grep -q "LogType:syslog" && break
+  yarn logs -applicationId "$APP" 2>/dev/null | grep -c "LogType:syslog" >/dev/null && break
   sleep 5
 done
-yarn logs -applicationId "$APP" 2>/dev/null | grep -q "LogType:syslog"
+yarn logs -applicationId "$APP" 2>/dev/null | grep -c "LogType:syslog" >/dev/null
 
 if mapred streaming -D mapreduce.job.name=orders-bad -D mapreduce.map.maxattempts=1 \
   -files /labs/03-job-history-and-logs/order-mapper.py,/labs/03-job-history-and-logs/sum-reducer.py \
@@ -35,7 +35,7 @@ BAD=$(yarn application -list -appStates ALL 2>/dev/null | awk "\$2==\"orders-bad
 echo "failed app: $BAD"
 
 for i in $(seq 1 30); do
-  yarn logs -applicationId "$BAD" 2>/dev/null | grep -q "ValueError" && break
+  yarn logs -applicationId "$BAD" 2>/dev/null | grep -c "ValueError" >/dev/null && break
   sleep 5
 done
 yarn logs -applicationId "$BAD" 2>/dev/null | grep "ValueError: could not convert string to float"
@@ -47,5 +47,5 @@ mapred streaming -D mapreduce.job.name=orders-fixed \
 hdfs dfs -cat /lab03/out-orders-fixed/part-00000
 '
 
-docker compose exec -T namenode curl -fsS http://history.localhost/jobhistory | grep -qi "jobhistory"
+docker compose exec -T namenode curl -fsS http://history.localhost/jobhistory | grep -ci "jobhistory" >/dev/null
 docker compose exec -T namenode bash /labs/03-job-history-and-logs/check.sh
