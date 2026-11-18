@@ -1,0 +1,61 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="540" viewBox="0 0 800 540" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
+<title id="title">Where job history and logs live</title>
+<desc id="desc">While a job runs, the ResourceManager proxies the tracking URL to the ApplicationMaster and each container writes logs on the NodeManager. When it finishes, logs are aggregated into HDFS /app-logs and the job history file is saved; the JobHistory server and yarn logs read them from there.</desc>
+<style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
+.t{font-size:21px;font-weight:700}
+.st{font-size:14px;fill:#6b7280}
+.h{font-size:15px;font-weight:600}
+.hs{font-size:14px;font-weight:600}
+.b{font-size:14px}
+.s{font-size:13px;fill:#6b7280}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.n{font-size:13px;font-weight:700;fill:#ffffff}</style>
+<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a2563eb" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#2563eb"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
+<rect width="800" height="540" fill="#ffffff"/>
+<text x="32" y="44" class="t">Where job history and logs live</text>
+<text x="32" y="68" class="st">Live views come from the running job. When it ends, everything is saved to HDFS.</text>
+<rect x="32" y="92" width="352" height="360" rx="14" fill="#f8fafc" stroke="#d1d5db" stroke-width="1.5"/>
+<circle cx="56" cy="118" r="11" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
+<text x="56" y="122.5" class="n" text-anchor="middle">1</text>
+<text x="76" y="123" class="h">While the job runs</text>
+<rect x="52" y="142" width="312" height="62" rx="12" fill="#e8efff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="208" y="168" class="h" text-anchor="middle">ResourceManager</text>
+<text x="208" y="188" class="s" text-anchor="middle">yarn.localhost · tracking URL</text>
+<rect x="52" y="248" width="312" height="184" rx="12" fill="#e8efff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="68" y="266" width="132" height="64" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+<text x="134" y="293" class="hs" text-anchor="middle">AM</text>
+<text x="134" y="314" class="s" text-anchor="middle">job web UI</text>
+<rect x="216" y="266" width="132" height="64" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.5"/>
+<text x="282" y="293" class="hs" text-anchor="middle">map / reduce</text>
+<text x="282" y="314" class="s" text-anchor="middle">tasks</text>
+<text x="68" y="358" class="s">Each container writes stdout, stderr</text>
+<text x="68" y="377" class="s">and syslog to the NodeManager's disk.</text>
+<text x="68" y="414" class="h">NodeManager</text>
+<text x="348" y="414" class="s" text-anchor="end">nodemanager.localhost</text>
+<path d="M134 204 L134 264" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 4" marker-end="url(#a2563eb)"/>
+<text x="146" y="238" class="s">proxies to the AM</text>
+<rect x="416" y="92" width="352" height="360" rx="14" fill="#f8fafc" stroke="#d1d5db" stroke-width="1.5"/>
+<circle cx="440" cy="118" r="11" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
+<text x="440" y="122.5" class="n" text-anchor="middle">2</text>
+<text x="460" y="123" class="h">After it finishes</text>
+<rect x="436" y="142" width="312" height="120" rx="12" fill="#fff7db" stroke="#f5b301" stroke-width="1.5" filter="url(#sh)"/>
+<text x="452" y="168" class="h">HDFS</text>
+<path d="M452 187 a2 2 0 0 1 2 -2 h5 l2 2 h7 a2 2 0 0 1 2 2 v8 a2 2 0 0 1 -2 2 h-14 a2 2 0 0 1 -2 -2 z" fill="#ffffff" stroke="#8a5a00" stroke-width="1.4"/>
+<text x="478" y="196" class="m">/app-logs/</text>
+<text x="732" y="196" class="s" text-anchor="end">container logs</text>
+<path d="M452 221 a2 2 0 0 1 2 -2 h5 l2 2 h7 a2 2 0 0 1 2 2 v8 a2 2 0 0 1 -2 2 h-14 a2 2 0 0 1 -2 -2 z" fill="#ffffff" stroke="#8a5a00" stroke-width="1.4"/>
+<text x="478" y="230" class="m">history/done/</text>
+<text x="732" y="230" class="s" text-anchor="end">job history files</text>
+<rect x="436" y="296" width="312" height="62" rx="12" fill="#e8efff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="592" y="322" class="h" text-anchor="middle">JobHistory server</text>
+<text x="592" y="342" class="s" text-anchor="middle">history.localhost · counters, tasks, logs</text>
+<path d="M592 262 L592 294" fill="none" stroke="#f5b301" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
+<rect x="436" y="378" width="312" height="54" rx="10" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5"/>
+<text x="452" y="400" class="m">yarn logs -applicationId &lt;app_id&gt;</text>
+<text x="452" y="420" class="s">prints the same logs in your terminal</text>
+<path d="M364 298 L400 298 L400 196 L434 196" fill="none" stroke="#f5b301" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
+<text x="32" y="484" class="s">On finish, the NodeManager uploads container logs to /app-logs (log aggregation), and the AM</text>
+<text x="32" y="504" class="s">saves a job history file. The tracking URL then redirects to history.localhost.</text>
+<text x="32" y="524" class="s">Needs the history profile: docker compose --profile history up -d --wait</text>
+</svg>

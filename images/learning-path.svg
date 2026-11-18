@@ -1,0 +1,104 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="640" viewBox="0 0 800 640" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
+<title id="title">Learning path for the 10 labs</title>
+<desc id="desc">Labs 01 to 03 are beginner, 04 to 07 intermediate, 08 to 10 advanced. Each card names the compose profile it needs.</desc>
+<style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
+.t{font-size:21px;font-weight:700}
+.st{font-size:14px;fill:#6b7280}
+.h{font-size:15px;font-weight:600}
+.hs{font-size:14px;font-weight:600}
+.b{font-size:14px}
+.s{font-size:13px;fill:#6b7280}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.n{font-size:13px;font-weight:700;fill:#ffffff}</style>
+<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter></defs>
+<rect width="800" height="640" fill="#ffffff"/>
+<text x="32" y="44" class="t">Learning path</text>
+<text x="32" y="68" class="st">Start at 01. Each card shows the profile it needs; core labs need nothing extra.</text>
+<text x="32" y="114" class="h">Beginner</text>
+<circle cx="115" cy="109" r="4.5" fill="#1f2937" stroke="#1f2937" stroke-width="1.3"/>
+<circle cx="128" cy="109" r="4.5" fill="#ffffff" stroke="#1f2937" stroke-width="1.3"/>
+<circle cx="141" cy="109" r="4.5" fill="#ffffff" stroke="#1f2937" stroke-width="1.3"/>
+<text x="161" y="114" class="s">your first cluster: files and jobs</text>
+<line x1="100" y1="184" x2="250" y2="184" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 6"/>
+<rect x="32" y="128" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="32" y="140" width="4" height="88" rx="2" fill="#f5b301"/>
+<text x="48" y="154" class="hs" style="fill:#8a5a00">Lab 01</text>
+<text x="48" y="176" class="hs">HDFS basics</text>
+<rect x="48" y="208" width="49.9" height="22" rx="11.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="72.95" y="223.5" class="s" text-anchor="middle" style="fill:#4b5563;font-weight:600">core</text>
+<rect x="182" y="128" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="182" y="140" width="4" height="88" rx="2" fill="#2563eb"/>
+<text x="198" y="154" class="hs" style="fill:#1d4ed8">Lab 02</text>
+<text x="198" y="176" class="hs">YARN and</text>
+<text x="198" y="194" class="hs">MapReduce</text>
+<rect x="198" y="208" width="49.9" height="22" rx="11.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="222.95" y="223.5" class="s" text-anchor="middle" style="fill:#4b5563;font-weight:600">core</text>
+<text x="32" y="288" class="h">Intermediate</text>
+<circle cx="149.5" cy="283" r="4.5" fill="#1f2937" stroke="#1f2937" stroke-width="1.3"/>
+<circle cx="162.5" cy="283" r="4.5" fill="#1f2937" stroke="#1f2937" stroke-width="1.3"/>
+<circle cx="175.5" cy="283" r="4.5" fill="#ffffff" stroke="#1f2937" stroke-width="1.3"/>
+<text x="195.5" y="288" class="s">logs, failures, Spark, file formats and SQL</text>
+<line x1="100" y1="358" x2="700" y2="358" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 6"/>
+<rect x="32" y="302" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="32" y="314" width="4" height="88" rx="2" fill="#2563eb"/>
+<text x="48" y="328" class="hs" style="fill:#1d4ed8">Lab 03</text>
+<text x="48" y="350" class="hs">Job history</text>
+<text x="48" y="368" class="hs">and logs</text>
+<rect x="48" y="382" width="72.325" height="22" rx="11.0" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="84.1625" y="397.5" class="s" text-anchor="middle" style="fill:#1d4ed8;font-weight:600">history</text>
+<rect x="182" y="302" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="182" y="314" width="4" height="88" rx="2" fill="#f5b301"/>
+<text x="198" y="328" class="hs" style="fill:#8a5a00">Lab 04</text>
+<text x="198" y="350" class="hs">Replication</text>
+<text x="198" y="368" class="hs">and failure</text>
+<rect x="198" y="382" width="72.325" height="22" rx="11.0" fill="#fff7db" stroke="#f5b301" stroke-width="1.2"/>
+<text x="234.162" y="397.5" class="s" text-anchor="middle" style="fill:#8a5a00;font-weight:600">cluster</text>
+<rect x="332" y="302" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="332" y="314" width="4" height="88" rx="2" fill="#e8590c"/>
+<text x="348" y="328" class="hs" style="fill:#c2410c">Lab 05</text>
+<text x="348" y="350" class="hs">Spark and</text>
+<text x="348" y="368" class="hs">Jupyter</text>
+<rect x="348" y="382" width="79.8" height="22" rx="11.0" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="387.9" y="397.5" class="s" text-anchor="middle" style="fill:#c2410c;font-weight:600">notebook</text>
+<rect x="482" y="302" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="482" y="314" width="4" height="88" rx="2" fill="#e8590c"/>
+<text x="498" y="328" class="hs" style="fill:#c2410c">Lab 06</text>
+<text x="498" y="350" class="hs">File formats</text>
+<text x="498" y="368" class="hs">and small files</text>
+<rect x="498" y="382" width="79.8" height="22" rx="11.0" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="537.9" y="397.5" class="s" text-anchor="middle" style="fill:#c2410c;font-weight:600">notebook</text>
+<rect x="632" y="302" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="632" y="314" width="4" height="88" rx="2" fill="#b45309"/>
+<text x="648" y="328" class="hs" style="fill:#92400e">Lab 07</text>
+<text x="648" y="350" class="hs">SQL with Hive</text>
+<rect x="648" y="382" width="49.9" height="22" rx="11.0" fill="#fdf3e2" stroke="#b45309" stroke-width="1.2"/>
+<text x="672.95" y="397.5" class="s" text-anchor="middle" style="fill:#92400e;font-weight:600">hive</text>
+<text x="32" y="462" class="h">Advanced</text>
+<circle cx="115" cy="457" r="4.5" fill="#1f2937" stroke="#1f2937" stroke-width="1.3"/>
+<circle cx="128" cy="457" r="4.5" fill="#1f2937" stroke="#1f2937" stroke-width="1.3"/>
+<circle cx="141" cy="457" r="4.5" fill="#1f2937" stroke="#1f2937" stroke-width="1.3"/>
+<text x="161" y="462" class="s">tables, streams and tuning</text>
+<line x1="100" y1="532" x2="400" y2="532" stroke="#d1d5db" stroke-width="2" stroke-linecap="round" stroke-dasharray="2 6"/>
+<rect x="32" y="476" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="32" y="488" width="4" height="88" rx="2" fill="#0d9488"/>
+<text x="48" y="502" class="hs" style="fill:#0f766e">Lab 08</text>
+<text x="48" y="524" class="hs">Iceberg tables</text>
+<rect x="48" y="556" width="79.8" height="22" rx="11.0" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="87.9" y="571.5" class="s" text-anchor="middle" style="fill:#c2410c;font-weight:600">notebook</text>
+<rect x="182" y="476" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="182" y="488" width="4" height="88" rx="2" fill="#334155"/>
+<text x="198" y="502" class="hs" style="fill:#334155">Lab 09</text>
+<text x="198" y="524" class="hs">Kafka streaming</text>
+<rect x="198" y="556" width="79.8" height="22" rx="11.0" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="237.9" y="571.5" class="s" text-anchor="middle" style="fill:#c2410c;font-weight:600">notebook</text>
+<rect x="198" y="529" width="57.375" height="22" rx="11.0" fill="#eef2f6" stroke="#334155" stroke-width="1.2"/>
+<text x="226.688" y="544.5" class="s" text-anchor="middle" style="fill:#334155;font-weight:600">kafka</text>
+<rect x="332" y="476" width="136" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="332" y="488" width="4" height="88" rx="2" fill="#2563eb"/>
+<text x="348" y="502" class="hs" style="fill:#1d4ed8">Lab 10</text>
+<text x="348" y="524" class="hs">Tuning YARN</text>
+<rect x="348" y="556" width="49.9" height="22" rx="11.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="372.95" y="571.5" class="s" text-anchor="middle" style="fill:#4b5563;font-weight:600">core</text>
+<text x="32" y="618" class="s">Chips are compose profiles: docker compose --profile &lt;name&gt; up -d --wait. “core” means no profile.</text>
+</svg>
