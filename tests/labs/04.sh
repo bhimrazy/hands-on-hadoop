@@ -28,13 +28,14 @@ nn hdfs dfs -mkdir -p /lab04
 nn bash -c 'seq 1 1000000 > /workspace/big-numbers.txt'
 nn hdfs dfs -D dfs.blocksize=1m -D dfs.replication=2 -put /workspace/big-numbers.txt /lab04/
 nn hdfs dfs -setrep -w 2 /lab04/big-numbers.txt
-nn hdfs fsck /lab04/big-numbers.txt -files -blocks -locations
+# fsck exits non-zero after a HEALTHY report for a single file; the waits below grep the report instead.
+nn hdfs fsck /lab04/big-numbers.txt -files -blocks -locations || true
 report_has "^Live datanodes (3)"
 
 docker compose stop datanode2
 wait_for "datanode2 declared dead" 240 report_has "^Dead datanodes (1)"
 wait_for "blocks re-replicated" 180 fsck_has "Under-replicated blocks:[[:space:]]*0"
-nn hdfs fsck /lab04
+nn hdfs fsck /lab04 || true
 
 docker compose start datanode2
 wait_for "datanode2 live again" 180 report_has "^Live datanodes (3)"

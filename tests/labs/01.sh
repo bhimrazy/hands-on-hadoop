@@ -14,7 +14,8 @@ hdfs fsck /lab01/numbers.txt -files -blocks
 hdfs dfs -get -f /lab01/sample.txt /workspace/sample-copy.txt
 hdfs dfs -du -h /lab01
 hdfs dfs -df -h /
-if hdfs dfs -put /labs/01-hdfs-basics/data/sample.txt /lab01/ 2>&1 | grep -q "File exists"; then
+reput=$(hdfs dfs -put /labs/01-hdfs-basics/data/sample.txt /lab01/ 2>&1 || true)
+if grep -q "File exists" <<<"$reput"; then
   echo "second put failed as expected"
 else
   echo "expected File exists error" >&2
