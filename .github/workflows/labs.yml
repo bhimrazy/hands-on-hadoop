@@ -1,0 +1,133 @@
+name: labs
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+  schedule:
+    - cron: "17 3 * * *"
+
+permissions:
+  contents: read
+
+concurrency:
+  group: labs-${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  discover:
+    runs-on: ubuntu-24.04
+    timeout-minutes: 5
+    outputs:
+      matrix: ${{ steps.matrix.outputs.matrix }}
+      count: ${{ steps.matrix.outputs.count }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+      - id: matrix
+        env:
+          EVENT: ${{ github.event_name }}
+        run: |
+          labs=$(find tests/labs -maxdepth 1 -name '*.sh' -exec basename {} .sh \; | sort | jq -R . | jq -sc .)
+          arm=false
+          if [ "$EVENT" = schedule ] || [ "$EVENT" = workflow_dispatch ]; then
+            arm=true
+          fi
+          matrix=$(jq -nc --argjson labs "$labs" --arg arm "$arm" '
+            {include: (
+              [$labs[] | {lab: ., runner: "ubuntu-24.04", arch: "x64"}]
+              + (if $arm == "true" and ($labs | length) > 0
+                 then [{lab: $labs[0], runner: "ubuntu-24.04-arm", arch: "arm64"}]
+                 else [] end)
+            )}')
+          echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
+          echo "count=$(jq length <<<"$labs")" >> "$GITHUB_OUTPUT"
+          jq . <<<"$matrix"
+
+  lab:
+    name: lab ${{ matrix.lab }} (${{ matrix.arch }})
+    needs: discover
+    if: needs.discover.outputs.count != '0'
+    runs-on: ${{ matrix.runner }}
+    timeout-minutes: ${{ matrix.arch == 'arm64' && 75 || 40 }}
+    continue-on-error: ${{ matrix.arch == 'arm64' }}
+    strategy:
+      fail-fast: false
+      matrix: ${{ fromJSON(needs.discover.outputs.matrix) }}
+    env:
+      LAB: ${{ matrix.lab }}
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Read lab header
+        id: header
+        run: |
+          script="tests/labs/${LAB}.sh"
+          profiles=$(sed -n 's/^# profiles:[[:space:]]*//p' "$script" | head -n1)
+          services=$(sed -n 's/^# services:[[:space:]]*//p' "$script" | head -n1)
+          args=""
+          for p in $profiles; do args="$args --profile $p"; done
+          {
+            echo "profile-args=${args# }"
+            echo "services=$services"
+            case " $profiles " in
+              *" notebook "*) echo "notebook=true" ;;
+              *) echo "notebook=false" ;;
+            esac
+          } >> "$GITHUB_OUTPUT"
+
+      - name: Set up QEMU for amd64 images
+        if: matrix.arch == 'arm64'
+        uses: docker/setup-qemu-action@99012661954931238ded8c8b007157a8430204e1 # v4.4.0
+        with:
+          platforms: amd64
+
+      - name: Resolve notebook build
+        id: notebook
+        if: steps.header.outputs.notebook == 'true'
+        run: |
+          cfg=$(docker compose --profile notebook config --format json)
+          echo "image=$(jq -r '.services.notebook.image' <<<"$cfg")" >> "$GITHUB_OUTPUT"
+          echo "context=$(jq -r '.services.notebook.build.context' <<<"$cfg")" >> "$GITHUB_OUTPUT"
+
+      - uses: docker/setup-buildx-action@f87e5991a6d7451dcb8d9637bfbc97413f497069 # v4.4.1
+        if: steps.header.outputs.notebook == 'true'
+
+      - name: Build notebook image
+        if: steps.header.outputs.notebook == 'true'
+        uses: docker/build-push-action@c3c9e263c25d99ce0380d002d59b67737d91b0dc # v7.4.0
+        with:
+          context: ${{ steps.notebook.outputs.context }}
+          tags: ${{ steps.notebook.outputs.image }}
+          load: true
+          push: false
+          cache-from: type=gha,scope=notebook-${{ matrix.arch }}
+          cache-to: type=gha,mode=max,scope=notebook-${{ matrix.arch }}
+
+      - name: Start stack
+        env:
+          PROFILE_ARGS: ${{ steps.header.outputs.profile-args }}
+          SERVICES: ${{ steps.header.outputs.services }}
+          NOTEBOOK: ${{ steps.header.outputs.notebook }}
+        run: |
+          no_build=""
+          if [ "$NOTEBOOK" = true ]; then no_build="--no-build"; fi
+          # shellcheck disable=SC2086
+          docker compose $PROFILE_ARGS up -d --wait --wait-timeout 600 $no_build $SERVICES
+
+      - name: Run lab test
+        run: bash "tests/labs/${LAB}.sh"
+
+      - name: Dump state on failure
+        if: failure()
+        run: |
+          docker compose --profile "*" ps -a
+          docker compose --profile "*" logs --no-color --tail 300
+
+      - name: Tear down
+        if: always()
+        run: docker compose --profile "*" down -v

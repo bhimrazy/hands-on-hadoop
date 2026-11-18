@@ -1,0 +1,77 @@
+name: Bug report
+description: A lab step, check or start command does not work as written.
+labels: [bug]
+body:
+  - type: markdown
+    attributes:
+      value: |
+        Thanks for helping. Please check [docs/troubleshooting.md](https://github.com/bhimrazy/hands-on-hadoop/blob/main/docs/troubleshooting.md) first.
+  - type: dropdown
+    id: lab
+    attributes:
+      label: Which lab?
+      options:
+        - 01 HDFS basics
+        - 02 YARN and MapReduce
+        - 03 Job history and logs
+        - 04 Replication and failure
+        - 05 Spark and Jupyter
+        - 06 File formats and small files
+        - 07 SQL with Hive
+        - 08 Iceberg tables
+        - 09 Kafka streaming
+        - 10 Tuning YARN
+        - Not lab specific
+    validations:
+      required: true
+  - type: dropdown
+    id: os
+    attributes:
+      label: Operating system
+      options:
+        - macOS
+        - Windows (WSL2)
+        - Windows (PowerShell, no WSL)
+        - Linux
+        - Other
+    validations:
+      required: true
+  - type: dropdown
+    id: arch
+    attributes:
+      label: CPU architecture
+      options:
+        - Apple Silicon / ARM64
+        - Intel / AMD64
+        - Not sure
+    validations:
+      required: true
+  - type: input
+    id: docker-memory
+    attributes:
+      label: Memory given to Docker
+      description: Docker Desktop > Settings > Resources, or `docker info | grep "Total Memory"`.
+      placeholder: 3 GB
+    validations:
+      required: true
+  - type: textarea
+    id: preflight
+    attributes:
+      label: Output of scripts/preflight.sh
+      description: Run `bash scripts/preflight.sh` (or `scripts/preflight.ps1` on Windows) and paste the output.
+      render: text
+    validations:
+      required: true
+  - type: textarea
+    id: what-happened
+    attributes:
+      label: What happened, and what did you expect?
+      description: Include the command you ran and the step number from the lab.
+    validations:
+      required: true
+  - type: textarea
+    id: logs
+    attributes:
+      label: Logs
+      description: Output of `docker compose --profile "*" ps -a` and `docker compose logs --tail 100 <service>`.
+      render: text

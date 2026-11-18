@@ -1,0 +1,29 @@
+name: Lab feedback
+description: A step was confusing, too slow, or could be explained better.
+labels: [feedback]
+body:
+  - type: input
+    id: lab
+    attributes:
+      label: Lab and step
+      placeholder: "Lab 02, step 4"
+    validations:
+      required: true
+  - type: dropdown
+    id: level
+    attributes:
+      label: How did the lab feel?
+      options:
+        - Too easy
+        - About right
+        - Too hard
+        - Too slow
+    validations:
+      required: true
+  - type: textarea
+    id: feedback
+    attributes:
+      label: What would make it better?
+      description: What confused you, what was missing, or what you would add.
+    validations:
+      required: true
