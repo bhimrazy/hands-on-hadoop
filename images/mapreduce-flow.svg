@@ -3,15 +3,15 @@
 <desc id="desc">Two input splits go to two map tasks that emit (word, 1). Shuffle and sort groups the pairs by word, one reducer sums them and writes part-r-00000 to HDFS.</desc>
 <style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
 .t{font-size:21px;font-weight:700}
-.st{font-size:14px;fill:#6b7280}
+.st{font-size:14px;fill:#5f6877}
 .h{font-size:15px;font-weight:600}
 .hs{font-size:14px;font-weight:600}
 .b{font-size:14px}
-.s{font-size:13px;fill:#6b7280}
-.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
-.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.s{font-size:13.5px;fill:#5f6877}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px;fill:#5f6877}
 .n{font-size:13px;font-weight:700;fill:#ffffff}</style>
-<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a6b7280" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#6b7280"/></marker></defs>
+<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a5f6877" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#5f6877"/></marker></defs>
 <rect width="800" height="456" fill="#ffffff"/>
 <text x="32" y="44" class="t">MapReduce wordcount, step by step</text>
 <text x="32" y="68" class="st">Two input splits and one reducer, the same shape as lab 02.</text>
@@ -33,8 +33,8 @@
 <text x="248" y="192" class="m" text-anchor="middle">(the, 1)</text>
 <text x="248" y="211" class="m" text-anchor="middle">(cat, 1)</text>
 <text x="248" y="230" class="m" text-anchor="middle">(sat, 1)</text>
-<path d="M160 196 L182 196" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<path d="M312 196 L334 226" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
+<path d="M160 196 L182 196" fill="none" stroke="#5f6877" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<path d="M312 196 L334 226" fill="none" stroke="#5f6877" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
 <rect x="32" y="268" width="128" height="100" rx="12" fill="#fff7db" stroke="#f5b301" stroke-width="1.5" filter="url(#sh)"/>
 <text x="96" y="302" class="s" text-anchor="middle">split 2</text>
 <text x="96" y="326" class="m" text-anchor="middle">the dog sat</text>
@@ -43,8 +43,8 @@
 <text x="248" y="314" class="m" text-anchor="middle">(the, 1)</text>
 <text x="248" y="333" class="m" text-anchor="middle">(dog, 1)</text>
 <text x="248" y="352" class="m" text-anchor="middle">(sat, 1)</text>
-<path d="M160 318 L182 318" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<path d="M312 318 L334 288" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
+<path d="M160 318 L182 318" fill="none" stroke="#5f6877" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<path d="M312 318 L334 288" fill="none" stroke="#5f6877" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
 <rect x="336" y="146" width="128" height="222" rx="12" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.5" filter="url(#sh)"/>
 <text x="400" y="174" class="s" text-anchor="middle">sorted by key</text>
 <text x="400" y="232" class="m" text-anchor="middle">cat [1]</text>
@@ -63,8 +63,8 @@
 <text x="704" y="258" class="m" text-anchor="middle" xml:space="preserve">dog   1</text>
 <text x="704" y="284" class="m" text-anchor="middle" xml:space="preserve">sat   2</text>
 <text x="704" y="310" class="m" text-anchor="middle" xml:space="preserve">the   2</text>
-<path d="M464 257 L486 257" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<path d="M616 257 L638 257" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
+<path d="M464 257 L486 257" fill="none" stroke="#5f6877" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<path d="M616 257 L638 257" fill="none" stroke="#5f6877" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
 <text x="32" y="410" class="s">The Java example jar and the Python streaming scripts (mapper.py, reducer.py) follow this same flow.</text>
 <text x="32" y="432" class="s">Each map and reduce task runs in its own YARN container. One reducer means one output file.</text>
 </svg>

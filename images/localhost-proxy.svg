@@ -1,21 +1,21 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="624" viewBox="0 0 800 624" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
 <title id="title">How *.localhost names reach the containers</title>
 <desc id="desc">The browser resolves any *.localhost name to 127.0.0.1. Caddy listens on port 80 and forwards each host name to a container. Inside Docker the same names are network aliases, so links the Hadoop UIs print work in both places.</desc>
 <style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
 .t{font-size:21px;font-weight:700}
-.st{font-size:14px;fill:#6b7280}
+.st{font-size:14px;fill:#5f6877}
 .h{font-size:15px;font-weight:600}
 .hs{font-size:14px;font-weight:600}
 .b{font-size:14px}
-.s{font-size:13px;fill:#6b7280}
-.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
-.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.s{font-size:13.5px;fill:#5f6877}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px;fill:#5f6877}
 .n{font-size:13px;font-weight:700;fill:#ffffff}</style>
-<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a2563eb" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#2563eb"/></marker><marker id="a6b7280" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#6b7280"/></marker><marker id="a7c3aed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#7c3aed"/></marker><marker id="ab45309" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#b45309"/></marker><marker id="ae8590c" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#e8590c"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
-<rect width="800" height="600" fill="#ffffff"/>
+<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a2563eb" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#2563eb"/></marker><marker id="a5f6877" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#5f6877"/></marker><marker id="a7c3aed" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#7c3aed"/></marker><marker id="ab45309" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#b45309"/></marker><marker id="ae8590c" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#e8590c"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
+<rect width="800" height="624" fill="#ffffff"/>
 <text x="32" y="44" class="t">How http://yarn.localhost reaches a container</text>
 <text x="32" y="68" class="st">Browsers send every *.localhost name to 127.0.0.1, so there is no hosts file to edit.</text>
-<rect x="32" y="96" width="212" height="276" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="32" y="96" width="212" height="300" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
 <path d="M32 108 a12 12 0 0 1 12 -12 h188 a12 12 0 0 1 12 12 v18 h-212 z" fill="#f8fafc"/>
 <line x1="32" y1="126" x2="244" y2="126" stroke="#d1d5db" stroke-width="1.5" stroke-linecap="round"/>
 <circle cx="48" cy="111" r="4" fill="#f87171"/>
@@ -31,7 +31,7 @@
 <text x="48" y="302" class="m">jupyter.localhost</text>
 <text x="48" y="328" class="m">spark.localhost</text>
 <text x="48" y="354" class="m">hive.localhost</text>
-<rect x="288" y="96" width="268" height="276" rx="12" fill="#f1ecff" stroke="#7c3aed" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="288" y="96" width="268" height="300" rx="12" fill="#f1ecff" stroke="#7c3aed" stroke-width="1.5" filter="url(#sh)"/>
 <text x="304" y="120" class="h">Caddy · 127.0.0.1:80</text>
 <text x="304" y="148" class="s">Host header → upstream</text>
 <text x="304" y="172" class="m" style="fill:#6d28d9">hdfs</text>
@@ -50,7 +50,8 @@
 <text x="540" y="328" class="m" text-anchor="end">notebook:4040</text>
 <text x="304" y="354" class="m" style="fill:#6d28d9">hive</text>
 <text x="540" y="354" class="m" text-anchor="end">hiveserver2:10002</text>
-<path d="M244 248 L286 248" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a7c3aed)"/>
+<text x="304" y="382" class="s">+ dn2, dn3 with the cluster profile</text>
+<path d="M244 246 L286 246" fill="none" stroke="#7c3aed" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a7c3aed)"/>
 <text x="608" y="120" class="h">Containers</text>
 <rect x="608" y="157" width="160" height="22" rx="8" fill="#fff7db" stroke="#f5b301" stroke-width="1.5"/>
 <text x="620" y="173" class="hs">namenode</text>
@@ -74,29 +75,29 @@
 <rect x="608" y="339" width="160" height="22" rx="8" fill="#fdf3e2" stroke="#b45309" stroke-width="1.5"/>
 <text x="620" y="355" class="hs">hiveserver2</text>
 <path d="M556 350 L606 350" fill="none" stroke="#b45309" stroke-width="1.2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ab45309)" opacity="0.85"/>
-<rect x="32" y="404" width="736" height="152" rx="14" fill="#f8fafc" stroke="#d1d5db" stroke-width="1.5"/>
-<text x="52" y="432" class="h">Why the links inside the Hadoop UIs work too</text>
-<text x="52" y="454" class="s">Each *.localhost name is also a Docker network alias, and the UIs listen on port 80.</text>
-<text x="52" y="492" class="hs">In your browser</text>
-<rect x="196" y="476" width="131.02" height="24" rx="12.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
-<text x="261.51" y="492.5" class="m" text-anchor="middle" style="fill:#4b5563;font-weight:400">yarn.localhost</text>
-<path d="M331.02 488 L353.02 488" fill="none" stroke="#6b7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<rect x="357.02" y="476" width="115.16" height="24" rx="12.0" fill="#f1ecff" stroke="#7c3aed" stroke-width="1.2"/>
-<text x="414.6" y="492.5" class="m" text-anchor="middle" style="fill:#6d28d9;font-weight:400">127.0.0.1:80</text>
-<path d="M476.18 488 L498.18 488" fill="none" stroke="#6b7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<rect x="502.18" y="476" width="59.65" height="24" rx="12.0" fill="#f1ecff" stroke="#7c3aed" stroke-width="1.2"/>
-<text x="532.005" y="492.5" class="m" text-anchor="middle" style="fill:#6d28d9;font-weight:400">Caddy</text>
-<path d="M565.83 488 L587.83 488" fill="none" stroke="#6b7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<rect x="591.83" y="476" width="138.95" height="24" rx="12.0" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
-<text x="661.305" y="492.5" class="m" text-anchor="middle" style="fill:#1d4ed8;font-weight:400">resourcemanager</text>
-<text x="52" y="528" class="hs">Inside Docker</text>
-<rect x="196" y="512" width="131.02" height="24" rx="12.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
-<text x="261.51" y="528.5" class="m" text-anchor="middle" style="fill:#4b5563;font-weight:400">yarn.localhost</text>
-<path d="M331.02 524 L353.02 524" fill="none" stroke="#6b7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<rect x="357.02" y="512" width="146.88" height="24" rx="12.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
-<text x="430.46" y="528.5" class="m" text-anchor="middle" style="fill:#4b5563;font-weight:400">Docker DNS alias</text>
-<path d="M507.9 524 L529.9 524" fill="none" stroke="#6b7280" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<rect x="533.9" y="512" width="138.95" height="24" rx="12.0" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
-<text x="603.375" y="528.5" class="m" text-anchor="middle" style="fill:#1d4ed8;font-weight:400">resourcemanager</text>
-<text x="32" y="584" class="s">So a link like http://nodemanager.localhost:80/node/containerlogs/… opens from the UI and from your laptop.</text>
+<rect x="32" y="428" width="736" height="152" rx="14" fill="#f8fafc" stroke="#d1d5db" stroke-width="1.5"/>
+<text x="52" y="456" class="h">Why the links inside the Hadoop UIs work too</text>
+<text x="52" y="478" class="s">Each *.localhost name is also a Docker network alias, and the UIs listen on port 80.</text>
+<text x="52" y="516" class="hs">In your browser</text>
+<rect x="196" y="500" width="135.29" height="24" rx="12.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="263.645" y="516.5" class="m" text-anchor="middle" style="fill:#4b5563;font-weight:400">yarn.localhost</text>
+<path d="M335.29 512 L357.29 512" fill="none" stroke="#5f6877" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<rect x="361.29" y="500" width="118.82" height="24" rx="12.0" fill="#f1ecff" stroke="#7c3aed" stroke-width="1.2"/>
+<text x="420.7" y="516.5" class="m" text-anchor="middle" style="fill:#6d28d9;font-weight:400">127.0.0.1:80</text>
+<path d="M484.11 512 L506.11 512" fill="none" stroke="#5f6877" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<rect x="510.11" y="500" width="61.175" height="24" rx="12.0" fill="#f1ecff" stroke="#7c3aed" stroke-width="1.2"/>
+<text x="540.697" y="516.5" class="m" text-anchor="middle" style="fill:#6d28d9;font-weight:400">Caddy</text>
+<path d="M575.285 512 L597.285 512" fill="none" stroke="#5f6877" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<rect x="601.285" y="500" width="143.525" height="24" rx="12.0" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="673.047" y="516.5" class="m" text-anchor="middle" style="fill:#1d4ed8;font-weight:400">resourcemanager</text>
+<text x="52" y="552" class="hs">Inside Docker</text>
+<rect x="196" y="536" width="135.29" height="24" rx="12.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="263.645" y="552.5" class="m" text-anchor="middle" style="fill:#4b5563;font-weight:400">yarn.localhost</text>
+<path d="M335.29 548 L357.29 548" fill="none" stroke="#5f6877" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<rect x="361.29" y="536" width="151.76" height="24" rx="12.0" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="437.17" y="552.5" class="m" text-anchor="middle" style="fill:#4b5563;font-weight:400">Docker DNS alias</text>
+<path d="M517.05 548 L539.05 548" fill="none" stroke="#5f6877" stroke-width="1.3" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<rect x="543.05" y="536" width="143.525" height="24" rx="12.0" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="614.812" y="552.5" class="m" text-anchor="middle" style="fill:#1d4ed8;font-weight:400">resourcemanager</text>
+<text x="32" y="608" class="s">So a link like http://nodemanager.localhost:80/node/containerlogs/… opens from the UI and from your laptop.</text>
 </svg>

@@ -1,20 +1,20 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="600" viewBox="0 0 800 600" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="560" viewBox="0 0 800 560" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
 <title id="title">Row-based versus columnar file formats, and small files</title>
-<desc id="desc">The same four rows stored as CSV row by row, and as Parquet or ORC column by column. A query for the average amount must read all of the CSV but only the amount column of the columnar file. Below, many small files cost far more NameNode memory than a few large ones.</desc>
+<desc id="desc">The same three rows stored as CSV row by row, and as Parquet or ORC column by column. A query for the average amount must read all of the CSV but only the amount column of the columnar file. Below, 500 small files cost the NameNode 1,000 objects where one compacted file costs 2.</desc>
 <style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
 .t{font-size:21px;font-weight:700}
-.st{font-size:14px;fill:#6b7280}
+.st{font-size:14px;fill:#5f6877}
 .h{font-size:15px;font-weight:600}
 .hs{font-size:14px;font-weight:600}
 .b{font-size:14px}
-.s{font-size:13px;fill:#6b7280}
-.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
-.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.s{font-size:13.5px;fill:#5f6877}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px;fill:#5f6877}
 .n{font-size:13px;font-weight:700;fill:#ffffff}</style>
 <defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="ae8590c" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#e8590c"/></marker></defs>
-<rect width="800" height="600" fill="#ffffff"/>
+<rect width="800" height="560" fill="#ffffff"/>
 <text x="32" y="44" class="t">Row vs columnar files</text>
-<text x="32" y="68" class="st">Same four rows, stored two ways. SELECT avg(amount) only needs one column.</text>
+<text x="32" y="68" class="st">Same three rows, stored two ways. SELECT avg(amount) only needs one column.</text>
 <text x="32" y="100" class="h">The table</text>
 <rect x="32" y="112" width="62" height="30" rx="0" fill="#e8efff" stroke="#2563eb" stroke-width="1"/>
 <text x="63" y="132" class="hs" text-anchor="middle">city</text>
@@ -24,8 +24,6 @@
 <text x="63" y="192" class="b" text-anchor="middle">Lima</text>
 <rect x="32" y="202" width="62" height="30" rx="0" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
 <text x="63" y="222" class="b" text-anchor="middle">Pune</text>
-<rect x="32" y="232" width="62" height="30" rx="0" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
-<text x="63" y="252" class="b" text-anchor="middle">Rome</text>
 <rect x="94" y="112" width="62" height="30" rx="0" fill="#e6f7f5" stroke="#0d9488" stroke-width="1"/>
 <text x="125" y="132" class="hs" text-anchor="middle">day</text>
 <rect x="94" y="142" width="62" height="30" rx="0" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
@@ -34,8 +32,6 @@
 <text x="125" y="192" class="b" text-anchor="middle">Tue</text>
 <rect x="94" y="202" width="62" height="30" rx="0" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
 <text x="125" y="222" class="b" text-anchor="middle">Wed</text>
-<rect x="94" y="232" width="62" height="30" rx="0" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
-<text x="125" y="252" class="b" text-anchor="middle">Thu</text>
 <rect x="156" y="112" width="62" height="30" rx="0" fill="#fff1e8" stroke="#e8590c" stroke-width="1"/>
 <text x="187" y="132" class="hs" text-anchor="middle">amount</text>
 <rect x="156" y="142" width="62" height="30" rx="0" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
@@ -44,118 +40,101 @@
 <text x="187" y="192" class="b" text-anchor="middle">30</text>
 <rect x="156" y="202" width="62" height="30" rx="0" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
 <text x="187" y="222" class="b" text-anchor="middle">7</text>
-<rect x="156" y="232" width="62" height="30" rx="0" fill="#ffffff" stroke="#d1d5db" stroke-width="1"/>
-<text x="187" y="252" class="b" text-anchor="middle">25</text>
-<text x="248" y="100" class="h">CSV: row by row</text>
-<rect x="248" y="112" width="34" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
-<text x="265" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Oslo</text>
-<rect x="284" y="112" width="34" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2"/>
-<text x="301" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Mon</text>
-<rect x="320" y="112" width="34" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="337" y="134" class="s" text-anchor="middle" style="fill:#1f2937">12</text>
-<rect x="364" y="112" width="34" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
-<text x="381" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Lima</text>
-<rect x="400" y="112" width="34" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2"/>
-<text x="417" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Tue</text>
-<rect x="436" y="112" width="34" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="453" y="134" class="s" text-anchor="middle" style="fill:#1f2937">30</text>
-<rect x="480" y="112" width="34" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
-<text x="497" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Pune</text>
-<rect x="516" y="112" width="34" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2"/>
-<text x="533" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Wed</text>
-<rect x="552" y="112" width="34" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="569" y="134" class="s" text-anchor="middle" style="fill:#1f2937">7</text>
-<rect x="596" y="112" width="34" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
-<text x="613" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Rome</text>
-<rect x="632" y="112" width="34" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2"/>
-<text x="649" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Thu</text>
-<rect x="668" y="112" width="34" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="685" y="134" class="s" text-anchor="middle" style="fill:#1f2937">25</text>
-<rect x="243" y="107" width="464" height="44" rx="8" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 4"/>
-<text x="248" y="172" class="s">avg(amount) has to read every byte of every row.</text>
-<text x="248" y="216" class="h">Parquet / ORC: column by column</text>
-<rect x="248" y="228" width="34" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2" opacity="0.35"/>
-<text x="265" y="250" class="s" text-anchor="middle" style="fill:#1f2937" opacity="0.4">Oslo</text>
-<rect x="284" y="228" width="34" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2" opacity="0.35"/>
-<text x="301" y="250" class="s" text-anchor="middle" style="fill:#1f2937" opacity="0.4">Lima</text>
-<rect x="320" y="228" width="34" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2" opacity="0.35"/>
-<text x="337" y="250" class="s" text-anchor="middle" style="fill:#1f2937" opacity="0.4">Pune</text>
-<rect x="356" y="228" width="34" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2" opacity="0.35"/>
-<text x="373" y="250" class="s" text-anchor="middle" style="fill:#1f2937" opacity="0.4">Rome</text>
-<rect x="400" y="228" width="34" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2" opacity="0.35"/>
-<text x="417" y="250" class="s" text-anchor="middle" style="fill:#1f2937" opacity="0.4">Mon</text>
-<rect x="436" y="228" width="34" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2" opacity="0.35"/>
-<text x="453" y="250" class="s" text-anchor="middle" style="fill:#1f2937" opacity="0.4">Tue</text>
-<rect x="472" y="228" width="34" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2" opacity="0.35"/>
-<text x="489" y="250" class="s" text-anchor="middle" style="fill:#1f2937" opacity="0.4">Wed</text>
-<rect x="508" y="228" width="34" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2" opacity="0.35"/>
-<text x="525" y="250" class="s" text-anchor="middle" style="fill:#1f2937" opacity="0.4">Thu</text>
-<rect x="552" y="228" width="34" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="569" y="250" class="s" text-anchor="middle" style="fill:#1f2937">12</text>
-<rect x="588" y="228" width="34" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="605" y="250" class="s" text-anchor="middle" style="fill:#1f2937">30</text>
-<rect x="624" y="228" width="34" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="641" y="250" class="s" text-anchor="middle" style="fill:#1f2937">7</text>
-<rect x="660" y="228" width="34" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="677" y="250" class="s" text-anchor="middle" style="fill:#1f2937">25</text>
-<rect x="704" y="228" width="56" height="34" rx="4" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
-<text x="732" y="250" class="s" text-anchor="middle">footer</text>
-<rect x="547" y="223" width="152" height="44" rx="8" fill="none" stroke="#16a34a" stroke-width="1.8"/>
-<text x="248" y="288" class="s">avg(amount) reads only the amount column. The footer</text>
-<text x="248" y="307" class="s">holds the schema and min/max stats used to find and skip chunks.</text>
-<text x="248" y="326" class="s">Similar values sit together, so each column also compresses well.</text>
-<rect x="32" y="360" width="736" height="214" rx="14" fill="#f8fafc" stroke="#d1d5db" stroke-width="1.5"/>
-<text x="52" y="388" class="h">Small files cost NameNode memory</text>
-<text x="52" y="409" class="s">Every file and every block is an object in the NameNode's heap (roughly 150 bytes each).</text>
-<rect x="52" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="52" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="52" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="52" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="68" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="68" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="68" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="68" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="84" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="84" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="84" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="84" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="100" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="100" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="100" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="100" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="116" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="116" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="116" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="116" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="132" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="132" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="132" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="132" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="148" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="148" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="148" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="148" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="164" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="164" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="164" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="164" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="180" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="180" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="180" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="180" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="196" y="428" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="196" y="444" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="196" y="460" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<rect x="196" y="476" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
-<text x="52" y="514" class="hs">1,000 small files</text>
-<text x="52" y="534" class="s">2,000 objects (files + blocks)</text>
-<text x="52" y="553" class="s">…only 40 drawn</text>
-<path d="M300 470 L420 470" fill="none" stroke="#e8590c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ae8590c)"/>
-<rect x="306.385" y="440" width="107.23" height="22" rx="11.0" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
-<text x="360" y="455.5" class="m" text-anchor="middle" style="fill:#c2410c;font-weight:400">coalesce(1)</text>
-<text x="360" y="500" class="s" text-anchor="middle">compact</text>
-<rect x="452" y="428" width="60" height="60" rx="6" fill="#fff7db" stroke="#f5b301" stroke-width="1.5"/>
-<text x="452" y="514" class="hs">1 file of 128 MB or less</text>
-<text x="452" y="534" class="s">2 objects</text>
-<text x="452" y="553" class="s">Same data, far less NameNode heap.</text>
+<text x="264" y="100" class="h">CSV: row by row</text>
+<rect x="264" y="112" width="42" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="285" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Oslo</text>
+<rect x="310" y="112" width="42" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2"/>
+<text x="331" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Mon</text>
+<rect x="356" y="112" width="42" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="377" y="134" class="s" text-anchor="middle" style="fill:#1f2937">12</text>
+<rect x="412" y="112" width="42" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="433" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Lima</text>
+<rect x="458" y="112" width="42" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2"/>
+<text x="479" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Tue</text>
+<rect x="504" y="112" width="42" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="525" y="134" class="s" text-anchor="middle" style="fill:#1f2937">30</text>
+<rect x="560" y="112" width="42" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2"/>
+<text x="581" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Pune</text>
+<rect x="606" y="112" width="42" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2"/>
+<text x="627" y="134" class="s" text-anchor="middle" style="fill:#1f2937">Wed</text>
+<rect x="652" y="112" width="42" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="673" y="134" class="s" text-anchor="middle" style="fill:#1f2937">7</text>
+<rect x="258" y="106" width="442" height="46" rx="8" fill="none" stroke="#dc2626" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="264" y="174" class="s">avg(amount) has to read every byte of every row.</text>
+<text x="264" y="212" class="h">Parquet / ORC: column by column</text>
+<rect x="264" y="224" width="42" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2" opacity="0.45"/>
+<text x="285" y="246" class="s" text-anchor="middle" style="fill:#5f6877">Oslo</text>
+<rect x="310" y="224" width="42" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2" opacity="0.45"/>
+<text x="331" y="246" class="s" text-anchor="middle" style="fill:#5f6877">Lima</text>
+<rect x="356" y="224" width="42" height="34" rx="4" fill="#e8efff" stroke="#2563eb" stroke-width="1.2" opacity="0.45"/>
+<text x="377" y="246" class="s" text-anchor="middle" style="fill:#5f6877">Pune</text>
+<rect x="412" y="224" width="42" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2" opacity="0.45"/>
+<text x="433" y="246" class="s" text-anchor="middle" style="fill:#5f6877">Mon</text>
+<rect x="458" y="224" width="42" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2" opacity="0.45"/>
+<text x="479" y="246" class="s" text-anchor="middle" style="fill:#5f6877">Tue</text>
+<rect x="504" y="224" width="42" height="34" rx="4" fill="#e6f7f5" stroke="#0d9488" stroke-width="1.2" opacity="0.45"/>
+<text x="525" y="246" class="s" text-anchor="middle" style="fill:#5f6877">Wed</text>
+<rect x="560" y="224" width="42" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="581" y="246" class="s" text-anchor="middle" style="fill:#1f2937">12</text>
+<rect x="606" y="224" width="42" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="627" y="246" class="s" text-anchor="middle" style="fill:#1f2937">30</text>
+<rect x="652" y="224" width="42" height="34" rx="4" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="673" y="246" class="s" text-anchor="middle" style="fill:#1f2937">7</text>
+<rect x="708" y="224" width="60" height="34" rx="4" fill="#f8fafc" stroke="#9ca3af" stroke-width="1.2"/>
+<text x="738" y="246" class="s" text-anchor="middle">footer</text>
+<rect x="554" y="218" width="146" height="46" rx="8" fill="none" stroke="#16a34a" stroke-width="1.8"/>
+<text x="264" y="286" class="s">avg(amount) reads only the amount column. The footer holds the</text>
+<text x="264" y="305" class="s">schema and min/max stats, so whole chunks can be skipped.</text>
+<rect x="32" y="336" width="736" height="200" rx="14" fill="#f8fafc" stroke="#d1d5db" stroke-width="1.5"/>
+<text x="52" y="364" class="h">Small files cost NameNode memory</text>
+<text x="52" y="385" class="s">Every file and every block is an object in the NameNode's heap (roughly 150 bytes each).</text>
+<rect x="52" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="52" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="52" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="52" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="68" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="68" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="68" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="68" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="84" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="84" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="84" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="84" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="100" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="100" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="100" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="100" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="116" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="116" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="116" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="116" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="132" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="132" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="132" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="132" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="148" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="148" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="148" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="148" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="164" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="164" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="164" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="164" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="180" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="180" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="180" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="180" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="196" y="404" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="196" y="420" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="196" y="436" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<rect x="196" y="452" width="12" height="12" rx="2" fill="#fff7db" stroke="#f5b301" stroke-width="1"/>
+<text x="52" y="490" class="hs">500 small files</text>
+<text x="52" y="510" class="s">1,000 objects (40 files drawn)</text>
+<path d="M300 446 L420 446" fill="none" stroke="#e8590c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ae8590c)"/>
+<rect x="304.707" y="416" width="110.585" height="22" rx="11.0" fill="#fff1e8" stroke="#e8590c" stroke-width="1.2"/>
+<text x="360" y="431.5" class="m" text-anchor="middle" style="fill:#c2410c;font-weight:400">coalesce(1)</text>
+<text x="360" y="468" class="s" text-anchor="middle">compact</text>
+<rect x="452" y="404" width="60" height="60" rx="6" fill="#fff7db" stroke="#f5b301" stroke-width="1.5"/>
+<text x="452" y="490" class="hs">1 file</text>
+<text x="452" y="510" class="s">2 objects. Same rows, far less NameNode heap.</text>
 </svg>

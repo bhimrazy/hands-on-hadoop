@@ -3,13 +3,13 @@
 <desc id="desc">A console producer sends lines to the Kafka topic 'lines'. Spark Structured Streaming in the notebook reads new offsets in micro-batches and appends Parquet files to HDFS, recording progress in a checkpoint.</desc>
 <style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
 .t{font-size:21px;font-weight:700}
-.st{font-size:14px;fill:#6b7280}
+.st{font-size:14px;fill:#5f6877}
 .h{font-size:15px;font-weight:600}
 .hs{font-size:14px;font-weight:600}
 .b{font-size:14px}
-.s{font-size:13px;fill:#6b7280}
-.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
-.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.s{font-size:13.5px;fill:#5f6877}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px;fill:#5f6877}
 .n{font-size:13px;font-weight:700;fill:#ffffff}</style>
 <defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a334155" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#334155"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
 <rect width="800" height="460" fill="#ffffff"/>
@@ -36,13 +36,16 @@
 <text x="303" y="222" class="m" text-anchor="middle">2</text>
 <rect x="319" y="200" width="26" height="34" rx="4" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
 <text x="332" y="222" class="m" text-anchor="middle">3</text>
-<rect x="348" y="200" width="26" height="34" rx="4" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+<rect x="348" y="200" width="26" height="34" rx="4" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
 <text x="361" y="222" class="m" text-anchor="middle">4</text>
-<rect x="377" y="200" width="26" height="34" rx="4" fill="#ffffff" stroke="#334155" stroke-width="1.8"/>
+<rect x="377" y="200" width="26" height="34" rx="4" fill="#ffffff" stroke="#334155" stroke-width="1.2"/>
 <text x="390" y="222" class="m" text-anchor="middle">5</text>
-<text x="232" y="256" class="s">offsets</text>
-<text x="232" y="280" class="s">Messages stay after they are</text>
-<text x="232" y="299" class="s">read; readers track offsets.</text>
+<path d="M232 239 v4 h113 v-4" fill="none" stroke="#e8590c" stroke-width="1.5" stroke-linejoin="round"/>
+<text x="288.5" y="260" class="s" text-anchor="middle" style="fill:#c2410c">batch 1</text>
+<path d="M348 239 v4 h55 v-4" fill="none" stroke="#e8590c" stroke-width="1.5" stroke-linejoin="round"/>
+<text x="375.5" y="260" class="s" text-anchor="middle" style="fill:#c2410c">batch 2</text>
+<text x="232" y="283" class="s">Messages stay after they are</text>
+<text x="232" y="302" class="s">read; readers track offsets.</text>
 <path d="M188 210 L214 210" fill="none" stroke="#334155" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a334155)"/>
 <rect x="452" y="104" width="160" height="210" rx="12" fill="#fff1e8" stroke="#e8590c" stroke-width="1.5" filter="url(#sh)"/>
 <text x="468" y="130" class="h">Spark</text>

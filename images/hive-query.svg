@@ -1,18 +1,18 @@
-<svg xmlns="http://www.w3.org/2000/svg" width="800" height="580" viewBox="0 0 800 580" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="588" viewBox="0 0 800 588" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
 <title id="title">How a Hive query runs in this lab</title>
 <desc id="desc">beeline sends SQL to HiveServer2. HiveServer2 plans the query, looks the table up in its embedded Derby metastore, and runs it with Tez in local mode inside its own JVM, reading and writing HDFS. YARN is not used.</desc>
 <style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
 .t{font-size:21px;font-weight:700}
-.st{font-size:14px;fill:#6b7280}
+.st{font-size:14px;fill:#5f6877}
 .h{font-size:15px;font-weight:600}
 .hs{font-size:14px;font-weight:600}
 .b{font-size:14px}
-.s{font-size:13px;fill:#6b7280}
-.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
-.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.s{font-size:13.5px;fill:#5f6877}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px;fill:#5f6877}
 .n{font-size:13px;font-weight:700;fill:#ffffff}</style>
-<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a6b7280" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#6b7280"/></marker><marker id="ab45309" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#b45309"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
-<rect width="800" height="580" fill="#ffffff"/>
+<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a5f6877" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#5f6877"/></marker><marker id="ab45309" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#b45309"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
+<rect width="800" height="588" fill="#ffffff"/>
 <text x="32" y="44" class="t">What happens when you run a Hive query</text>
 <text x="32" y="68" class="st">HiveServer2 plans the SQL and runs it itself, with Tez in local mode. Data stays in HDFS.</text>
 <rect x="32" y="120" width="190" height="96" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
@@ -22,51 +22,49 @@
 <rect x="32" y="264" width="190" height="70" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
 <text x="48" y="290" class="h">Your browser</text>
 <text x="48" y="314" class="m">hive.localhost</text>
-<rect x="254" y="96" width="300" height="336" rx="12" fill="#fdf3e2" stroke="#b45309" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="254" y="96" width="300" height="344" rx="12" fill="#fdf3e2" stroke="#b45309" stroke-width="1.5" filter="url(#sh)"/>
 <text x="274" y="122" class="h">hiveserver2</text>
 <text x="534" y="122" class="s" text-anchor="end">profile: hive</text>
 <rect x="274" y="140" width="260" height="64" rx="10" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>
 <circle cx="296" cy="164" r="10" fill="#b45309" stroke="#ffffff" stroke-width="2"/>
-<text x="296" y="168.5" class="n" text-anchor="middle">1</text>
+<text x="296" y="168.5" class="n" text-anchor="middle" style="fill:#ffffff">1</text>
 <text x="316" y="169" class="hs">Parse and plan</text>
 <text x="316" y="189" class="s">SQL → a plan of stages</text>
 <path d="M404 204 L404 226" fill="none" stroke="#b45309" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ab45309)"/>
 <rect x="274" y="228" width="260" height="82" rx="10" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>
 <circle cx="296" cy="252" r="10" fill="#b45309" stroke="#ffffff" stroke-width="2"/>
-<text x="296" y="256.5" class="n" text-anchor="middle">2</text>
+<text x="296" y="256.5" class="n" text-anchor="middle" style="fill:#ffffff">2</text>
 <text x="316" y="257" class="hs">Look up the table</text>
 <text x="316" y="277" class="s">metastore in embedded Derby:</text>
 <text x="316" y="296" class="s">columns + HDFS location</text>
 <path d="M404 310 L404 332" fill="none" stroke="#b45309" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ab45309)"/>
 <rect x="274" y="334" width="260" height="64" rx="10" fill="#ffffff" stroke="#b45309" stroke-width="1.5"/>
 <circle cx="296" cy="358" r="10" fill="#b45309" stroke="#ffffff" stroke-width="2"/>
-<text x="296" y="362.5" class="n" text-anchor="middle">3</text>
+<text x="296" y="362.5" class="n" text-anchor="middle" style="fill:#ffffff">3</text>
 <text x="316" y="363" class="hs">Run with Tez, local mode</text>
 <text x="316" y="383" class="s">inside this same JVM</text>
-<text x="274" y="414" class="s">Web UI on port 10002 → hive.localhost</text>
+<text x="274" y="422" class="s">Web UI on port 10002 → hive.localhost</text>
 <path d="M222 168 L272 168" fill="none" stroke="#b45309" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ab45309)"/>
-<path d="M222 299 L252 299" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a6b7280)"/>
-<rect x="586" y="96" width="182" height="336" rx="12" fill="#fff7db" stroke="#f5b301" stroke-width="1.5" filter="url(#sh)"/>
+<path d="M222 299 L252 299" fill="none" stroke="#5f6877" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<rect x="586" y="96" width="182" height="344" rx="12" fill="#fff7db" stroke="#f5b301" stroke-width="1.5" filter="url(#sh)"/>
 <text x="602" y="122" class="h">HDFS</text>
-<rect x="602" y="140" width="150" height="120" rx="10" fill="#ffffff" stroke="#f5b301" stroke-width="1.5"/>
+<rect x="602" y="140" width="150" height="130" rx="10" fill="#ffffff" stroke="#f5b301" stroke-width="1.5"/>
 <text x="616" y="164" class="hs">external table</text>
-<text x="616" y="188" class="m">/data/…</text>
-<text x="616" y="212" class="s">your files.</text>
-<text x="616" y="231" class="s">DROP TABLE</text>
-<text x="616" y="250" class="s">leaves them.</text>
-<rect x="602" y="276" width="150" height="136" rx="10" fill="#ffffff" stroke="#f5b301" stroke-width="1.5"/>
-<text x="616" y="300" class="hs">managed table</text>
-<text x="616" y="324" class="m">/user/hive/</text>
-<text x="616" y="343" class="m">warehouse/…</text>
-<text x="616" y="367" class="s">ORC files Hive</text>
-<text x="616" y="386" class="s">owns. DROP TABLE</text>
-<text x="616" y="405" class="s">deletes them.</text>
-<path d="M570 366 L536 366" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
-<path d="M570 366 L570 344 L600 344" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
-<path d="M570 366 L570 200 L600 200" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
-<rect x="254" y="456" width="514" height="78" rx="10" fill="#ffffff" stroke="#c7cdd6" stroke-width="1.5" stroke-dasharray="5 4"/>
-<text x="274" y="481" class="hs" style="fill:#6b7280">YARN is not used</text>
-<text x="274" y="502" class="s">Queries won't appear on yarn.localhost. Hive 4.2 needs Java 21,</text>
-<text x="274" y="521" class="s">and the Hadoop image runs Java 11, so HiveServer2 runs them itself.</text>
-<text x="32" y="562" class="s">Start it with: docker compose --profile hive up -d --wait</text>
+<text x="616" y="188" class="m">/user/lab/07/</text>
+<text x="616" y="207" class="m">sales/</text>
+<text x="616" y="233" class="s">DROP TABLE</text>
+<text x="616" y="252" class="s">keeps the files.</text>
+<rect x="602" y="290" width="150" height="130" rx="10" fill="#ffffff" stroke="#f5b301" stroke-width="1.5"/>
+<text x="616" y="314" class="hs">managed table</text>
+<text x="616" y="338" class="m">/user/hive/</text>
+<text x="616" y="357" class="m">warehouse/…</text>
+<text x="616" y="383" class="s">DROP TABLE</text>
+<text x="616" y="402" class="s">deletes the files.</text>
+<path d="M536 366 L600 366" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)" marker-start="url(#af5b301)"/>
+<path d="M570 366 L570 205 L600 205" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
+<rect x="254" y="464" width="514" height="78" rx="10" fill="#ffffff" stroke="#c7cdd6" stroke-width="1.5" stroke-dasharray="5 4"/>
+<text x="274" y="489" class="hs" style="fill:#5f6877">YARN is not used</text>
+<text x="274" y="510" class="s">Queries won't appear on yarn.localhost. Hive 4 needs Java 21 and the</text>
+<text x="274" y="529" class="s">Hadoop image runs Java 11, so HiveServer2 runs them itself.</text>
+<text x="32" y="570" class="s">Start it with: docker compose --profile hive up -d --wait</text>
 </svg>

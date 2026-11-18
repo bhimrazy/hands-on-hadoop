@@ -3,26 +3,25 @@
 <desc id="desc">The notebook container runs JupyterLab and a Spark driver in local mode. The driver asks the NameNode for block locations, tasks running as threads read blocks from the DataNode and write results back. YARN is not used.</desc>
 <style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
 .t{font-size:21px;font-weight:700}
-.st{font-size:14px;fill:#6b7280}
+.st{font-size:14px;fill:#5f6877}
 .h{font-size:15px;font-weight:600}
 .hs{font-size:14px;font-weight:600}
 .b{font-size:14px}
-.s{font-size:13px;fill:#6b7280}
-.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
-.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.s{font-size:13.5px;fill:#5f6877}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px;fill:#5f6877}
 .n{font-size:13px;font-weight:700;fill:#ffffff}</style>
 <defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="ae8590c" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#e8590c"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
 <rect width="800" height="560" fill="#ffffff"/>
 <text x="32" y="44" class="t">Spark in the notebook, data in HDFS</text>
 <text x="32" y="68" class="st">Spark runs in local mode inside the notebook container. It uses HDFS, not YARN.</text>
-<rect x="32" y="96" width="196" height="92" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<rect x="32" y="96" width="196" height="150" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
 <text x="48" y="122" class="h">Your browser</text>
-<text x="48" y="146" class="m">jupyter.localhost</text>
-<text x="48" y="168" class="m">spark.localhost</text>
-<path d="M228 142 L262 142" fill="none" stroke="#e8590c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ae8590c)"/>
-<text x="32" y="222" class="s">spark.localhost is the</text>
-<text x="32" y="241" class="s">Spark UI (port 4040) of</text>
-<text x="32" y="260" class="s">the running session.</text>
+<text x="48" y="150" class="m">jupyter.localhost</text>
+<text x="48" y="169" class="s">JupyterLab</text>
+<text x="48" y="201" class="m">spark.localhost</text>
+<text x="48" y="220" class="s">Spark UI of the session</text>
+<path d="M228 171 L262 171" fill="none" stroke="#e8590c" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#ae8590c)"/>
 <rect x="264" y="96" width="300" height="300" rx="12" fill="#fff1e8" stroke="#e8590c" stroke-width="1.5" filter="url(#sh)"/>
 <text x="284" y="122" class="h">notebook container</text>
 <text x="284" y="142" class="s">JupyterLab + PySpark</text>
@@ -57,23 +56,23 @@
 <text x="690" y="362" class="s" text-anchor="middle">block bytes</text>
 <path d="M544 186 L626 186" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
 <circle cx="585" cy="186" r="11" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="585" y="190.5" class="n" text-anchor="middle">1</text>
+<text x="585" y="190.5" class="n" text-anchor="middle" style="fill:#1f2937">1</text>
 <path d="M626 304 L546 304" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
 <circle cx="585" cy="304" r="11" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="585" y="308.5" class="n" text-anchor="middle">2</text>
+<text x="585" y="308.5" class="n" text-anchor="middle" style="fill:#1f2937">2</text>
 <path d="M544 344 L626 344" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
 <circle cx="585" cy="344" r="11" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="585" y="348.5" class="n" text-anchor="middle">3</text>
+<text x="585" y="348.5" class="n" text-anchor="middle" style="fill:#1f2937">3</text>
 <rect x="264" y="414" width="504" height="40" rx="10" fill="#ffffff" stroke="#c7cdd6" stroke-width="1.5" stroke-dasharray="5 4"/>
-<text x="284" y="439" class="hs" style="fill:#9ca3af">YARN</text>
+<text x="284" y="439" class="hs" style="fill:#5f6877">YARN</text>
 <text x="330" y="439" class="s">resourcemanager, nodemanager: idle for Spark here</text>
 <circle cx="44" cy="493" r="10" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="497.5" class="n" text-anchor="middle">1</text>
+<text x="44" y="497.5" class="n" text-anchor="middle" style="fill:#1f2937">1</text>
 <text x="64" y="498" class="b">The driver asks the NameNode where the file's blocks are (hdfs://namenode:8020).</text>
 <circle cx="44" cy="515" r="10" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="519.5" class="n" text-anchor="middle">2</text>
+<text x="44" y="519.5" class="n" text-anchor="middle" style="fill:#1f2937">2</text>
 <text x="64" y="520" class="b">Tasks read the blocks straight from the DataNode, one task per block or split.</text>
 <circle cx="44" cy="537" r="10" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="541.5" class="n" text-anchor="middle">3</text>
+<text x="44" y="541.5" class="n" text-anchor="middle" style="fill:#1f2937">3</text>
 <text x="64" y="542" class="b">Results, for example Parquet files, are written back to HDFS.</text>
 </svg>

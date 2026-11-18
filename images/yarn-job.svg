@@ -3,15 +3,15 @@
 <desc id="desc">Numbered steps: the client submits to the ResourceManager, which starts an ApplicationMaster on the NodeManager. The AM requests containers, starts map and reduce tasks in them, the tasks use HDFS, and progress flows back to the client.</desc>
 <style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
 .t{font-size:21px;font-weight:700}
-.st{font-size:14px;fill:#6b7280}
+.st{font-size:14px;fill:#5f6877}
 .h{font-size:15px;font-weight:600}
 .hs{font-size:14px;font-weight:600}
 .b{font-size:14px}
-.s{font-size:13px;fill:#6b7280}
-.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px}
-.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13px;fill:#6b7280}
+.s{font-size:13.5px;fill:#5f6877}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px;fill:#5f6877}
 .n{font-size:13px;font-weight:700;fill:#ffffff}</style>
-<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a2563eb" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#2563eb"/></marker><marker id="a6b7280" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#6b7280"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
+<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a2563eb" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#2563eb"/></marker><marker id="a5f6877" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#5f6877"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
 <rect width="800" height="620" fill="#ffffff"/>
 <text x="32" y="44" class="t">How YARN runs a job</text>
 <text x="32" y="68" class="st">A MapReduce job such as wordcount, on the lab's single NodeManager.</text>
@@ -24,58 +24,58 @@
 <rect x="560" y="100" width="208" height="72" rx="12" fill="#fff7db" stroke="#f5b301" stroke-width="1.5" filter="url(#sh)"/>
 <text x="664" y="131" class="h" text-anchor="middle">HDFS</text>
 <text x="664" y="151" class="s" text-anchor="middle">input and output files</text>
-<rect x="232" y="242" width="536" height="192" rx="12" fill="#e8efff" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="6 4"/>
-<rect x="252" y="270" width="152" height="82" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
-<text x="328" y="306" class="hs" text-anchor="middle">ApplicationMaster</text>
-<text x="328" y="328" class="s" text-anchor="middle">384 MB · one per job</text>
-<rect x="424" y="270" width="152" height="82" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
-<text x="500" y="306" class="hs" text-anchor="middle">map task</text>
-<text x="500" y="328" class="s" text-anchor="middle">256 MB</text>
-<rect x="596" y="270" width="152" height="82" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
-<text x="672" y="306" class="hs" text-anchor="middle">reduce task</text>
-<text x="672" y="328" class="s" text-anchor="middle">256 MB</text>
-<text x="252" y="396" class="h">NodeManager</text>
-<text x="748" y="396" class="s" text-anchor="end">nodemanager.localhost · 768 MB for containers</text>
-<text x="252" y="418" class="s">A container is a slice of the NodeManager's memory and CPU.</text>
+<rect x="224" y="242" width="544" height="192" rx="12" fill="#e8efff" stroke="#2563eb" stroke-width="1.5" stroke-dasharray="6 4"/>
+<rect x="240" y="270" width="144" height="82" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="312" y="306" class="hs" text-anchor="middle">ApplicationMaster</text>
+<text x="312" y="328" class="s" text-anchor="middle">384 MB</text>
+<rect x="424" y="270" width="144" height="82" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="496" y="306" class="hs" text-anchor="middle">map task</text>
+<text x="496" y="328" class="s" text-anchor="middle">256 MB</text>
+<rect x="608" y="270" width="144" height="82" rx="10" fill="#ffffff" stroke="#2563eb" stroke-width="1.5" filter="url(#sh)"/>
+<text x="680" y="306" class="hs" text-anchor="middle">reduce task</text>
+<text x="680" y="328" class="s" text-anchor="middle">256 MB</text>
+<text x="240" y="396" class="h">NodeManager</text>
+<text x="752" y="396" class="s" text-anchor="end">nodemanager.localhost · 768 MB for containers</text>
+<text x="240" y="418" class="s">A container is a slice of the NodeManager's memory and CPU.</text>
 <path d="M208 136 L254 136" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)"/>
 <circle cx="231" cy="136" r="11" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
-<text x="231" y="140.5" class="n" text-anchor="middle">1</text>
-<path d="M300 172 L300 268" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)"/>
-<circle cx="300" cy="214" r="11" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
-<text x="300" y="218.5" class="n" text-anchor="middle">2</text>
-<path d="M368 268 L368 174" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)" marker-start="url(#a2563eb)"/>
-<circle cx="368" cy="214" r="11" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
-<text x="368" y="218.5" class="n" text-anchor="middle">3</text>
-<path d="M404 311 L422 311" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)"/>
-<circle cx="413" cy="288" r="10" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
-<text x="413" y="292.5" class="n" text-anchor="middle">4</text>
-<path d="M380 354 Q500 380 640 354" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)"/>
-<path d="M500 268 L600 174" fill="none" stroke="#f5b301" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)" marker-start="url(#af5b301)"/>
+<text x="231" y="140.5" class="n" text-anchor="middle" style="fill:#ffffff">1</text>
+<path d="M286 172 L286 268" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)"/>
+<circle cx="286" cy="214" r="11" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
+<text x="286" y="218.5" class="n" text-anchor="middle" style="fill:#ffffff">2</text>
+<path d="M346 268 L346 174" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)" marker-start="url(#a2563eb)"/>
+<circle cx="346" cy="214" r="11" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
+<text x="346" y="218.5" class="n" text-anchor="middle" style="fill:#ffffff">3</text>
+<path d="M384 311 L422 311" fill="none" stroke="#2563eb" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)"/>
+<circle cx="402" cy="311" r="10" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
+<text x="402" y="315.5" class="n" text-anchor="middle" style="fill:#ffffff">4</text>
+<path d="M330 354 Q505 390 678 355" fill="none" stroke="#2563eb" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a2563eb)"/>
+<path d="M520 268 L610 174" fill="none" stroke="#f5b301" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)" marker-start="url(#af5b301)"/>
 <path d="M690 268 L690 174" fill="none" stroke="#f5b301" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)" marker-start="url(#af5b301)"/>
-<circle cx="550" cy="221" r="11" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="550" y="225.5" class="n" text-anchor="middle">5</text>
+<circle cx="565" cy="221" r="11" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
+<text x="565" y="225.5" class="n" text-anchor="middle" style="fill:#1f2937">5</text>
 <circle cx="690" cy="221" r="11" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="690" y="225.5" class="n" text-anchor="middle">5</text>
-<path d="M252 311 L120 311 L120 174" fill="none" stroke="#6b7280" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 4" marker-end="url(#a6b7280)"/>
-<circle cx="120" cy="244" r="11" fill="#9ca3af" stroke="#ffffff" stroke-width="2"/>
-<text x="120" y="248.5" class="n" text-anchor="middle">6</text>
+<text x="690" y="225.5" class="n" text-anchor="middle" style="fill:#1f2937">5</text>
+<path d="M238 311 L120 311 L120 174" fill="none" stroke="#5f6877" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round" stroke-dasharray="4 4" marker-end="url(#a5f6877)"/>
+<circle cx="120" cy="244" r="11" fill="#6b7280" stroke="#ffffff" stroke-width="2"/>
+<text x="120" y="248.5" class="n" text-anchor="middle" style="fill:#ffffff">6</text>
 <circle cx="44" cy="465" r="10" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="469.5" class="n" text-anchor="middle">1</text>
+<text x="44" y="469.5" class="n" text-anchor="middle" style="fill:#ffffff">1</text>
 <text x="64" y="470" class="b">The client submits the job to the ResourceManager.</text>
 <circle cx="44" cy="487" r="10" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="491.5" class="n" text-anchor="middle">2</text>
+<text x="44" y="491.5" class="n" text-anchor="middle" style="fill:#ffffff">2</text>
 <text x="64" y="492" class="b">The RM starts an ApplicationMaster (AM) in a container on a NodeManager.</text>
 <circle cx="44" cy="509" r="10" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="513.5" class="n" text-anchor="middle">3</text>
+<text x="44" y="513.5" class="n" text-anchor="middle" style="fill:#ffffff">3</text>
 <text x="64" y="514" class="b">The AM asks the RM for task containers; the RM grants them as memory frees up.</text>
 <circle cx="44" cy="531" r="10" fill="#2563eb" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="535.5" class="n" text-anchor="middle">4</text>
+<text x="44" y="535.5" class="n" text-anchor="middle" style="fill:#ffffff">4</text>
 <text x="64" y="536" class="b">The AM starts map tasks, then reduce tasks, in those containers.</text>
 <circle cx="44" cy="553" r="10" fill="#f5b301" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="557.5" class="n" text-anchor="middle">5</text>
+<text x="44" y="557.5" class="n" text-anchor="middle" style="fill:#1f2937">5</text>
 <text x="64" y="558" class="b">Map tasks read input blocks from HDFS; reduce tasks write the output back.</text>
-<circle cx="44" cy="575" r="10" fill="#9ca3af" stroke="#ffffff" stroke-width="2"/>
-<text x="44" y="579.5" class="n" text-anchor="middle">6</text>
+<circle cx="44" cy="575" r="10" fill="#6b7280" stroke="#ffffff" stroke-width="2"/>
+<text x="44" y="579.5" class="n" text-anchor="middle" style="fill:#ffffff">6</text>
 <text x="64" y="580" class="b">The AM reports progress; the client prints it and a tracking URL on yarn.localhost.</text>
 <text x="32" y="608" class="s">768 MB fits the AM plus one 256 MB task at a time, so tasks queue up. Lab 10 tunes this.</text>
 </svg>
