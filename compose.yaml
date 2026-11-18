@@ -92,7 +92,7 @@ services:
     <<: *hadoop
     hostname: namenode
     # Formats HDFS on first boot only (ENSURE_NAMENODE_DIR).
-    entrypoint: ["bash", "-c", "sudo chown hadoop:users /data && exec /opt/starter.sh hdfs namenode"]
+    entrypoint: ["bash", "-c", "sudo chown hadoop:users /data && sudo chmod a+rwx /workspace && exec /opt/starter.sh hdfs namenode"]
     deploy:
       resources:
         limits:
