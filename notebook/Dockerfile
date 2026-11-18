@@ -1,4 +1,4 @@
-FROM ghcr.io/astral-sh/uv:0.11.8@sha256:3b7b60a81d3c57ef471703e5c83fd4aaa33abcd403596fb22ab07db85ae91347 AS uv
+FROM ghcr.io/astral-sh/uv:0.13.9@sha256:d3b601f0c7b118bc1753febf7c41cc80981df678445e0254284eecf84db79a7d AS uv
 
 FROM spark:4.3.0-python3@sha256:3f34ea24b3aa6de84c942d463657d203d08455d24e62f2df3ff16d7367bff200
 
