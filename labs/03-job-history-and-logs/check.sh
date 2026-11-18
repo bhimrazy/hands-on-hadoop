@@ -25,11 +25,11 @@ else
     "run the failing job from step 5 with -D mapreduce.job.name=orders-bad"
 fi
 
-if hdfs dfs -test -e /lab03/out-orders-bad; then
-  fail "the failed job left no output folder" \
-    "remove it: hdfs dfs -rm -r /lab03/out-orders-bad"
+if hdfs dfs -ls '/lab03/out-orders-bad/part-*' >/dev/null 2>&1; then
+  fail "the failed job wrote no result files" \
+    "the orders-bad job should fail; run it with order-mapper.py, not the fixed one"
 else
-  pass "the failed job left no output folder"
+  pass "the failed job wrote no result files"
 fi
 
 check_hdfs_contains /lab03/out-orders-fixed/part-00000 "pencil" "the fixed job wrote totals per product" \

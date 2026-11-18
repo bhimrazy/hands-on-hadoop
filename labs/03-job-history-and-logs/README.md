@@ -173,7 +173,7 @@ That is the whole story: line 6 of the mapper, and the bad value `n/a`.
 
 Now find the same thing in the browser. Open <http://history.localhost>, click the `orders-bad` job (state `FAILED`), then **Failed** under the map tasks, then the attempt's **logs** link.
 
-> A failed job writes no output folder. Run `hdfs dfs -ls /lab03` and you will not see `out-orders-bad`.
+> A failed job writes no results. Hadoop creates `/lab03/out-orders-bad` when the job starts, so the folder exists but holds no `part-*` files. Delete it before you run the job again.
 
 ### 7. Fix the mapper and rerun
 
@@ -212,7 +212,7 @@ PASS  the notes wordcount finished
 PASS  aggregated logs are stored in /app-logs
 PASS  the history server has job history files
 PASS  the failing job orders-bad ran and failed
-PASS  the failed job left no output folder
+PASS  the failed job wrote no result files
 PASS  the fixed job wrote totals per product
 All 6 checks passed
 ```
