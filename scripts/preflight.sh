@@ -12,7 +12,7 @@ echo "hands-on-hadoop preflight"
 echo
 
 if ! command -v docker >/dev/null 2>&1; then
-  bad "Docker is not installed." "Install Docker Desktop (Mac/Windows) or Docker Engine (Linux): https://docs.docker.com/get-docker/"
+  bad "Docker is not installed." "Install Docker Desktop (Mac/Windows) or Docker Engine (Linux): https://docs.docker.com/get-started/get-docker/"
   echo
   exit 1
 fi
