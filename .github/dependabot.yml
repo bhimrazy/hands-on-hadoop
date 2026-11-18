@@ -27,6 +27,12 @@ updates:
       - docker
     commit-message:
       prefix: "deps(docker)"
+    # The Iceberg runtime and Kafka connector jars in notebook/Dockerfile are built per Spark minor version.
+    ignore:
+      - dependency-name: spark
+        update-types:
+          - version-update:semver-minor
+          - version-update:semver-major
     groups:
       docker-minor-patch:
         update-types:
