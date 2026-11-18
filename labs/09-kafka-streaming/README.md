@@ -93,7 +93,11 @@ Processed a total of 6 messages
 
 ### 4. Count words as they arrive
 
-Open <http://jupyter.localhost> and open `streaming.ipynb` from the `labs/09-kafka-streaming` folder. The lab folder is read-only, so use **File → Save Notebook As** if you want your own copy in `workspace/`.
+Copy the notebook into your workspace, then open <http://jupyter.localhost> and double-click `streaming.ipynb`:
+
+```bash
+docker compose exec notebook cp /labs/09-kafka-streaming/streaming.ipynb /workspace/
+```
 
 Run the cells from the top down to the first word count (**Shift+Enter** runs a cell). The query reads the topic from the earliest offset and keeps a running table in memory.
 
