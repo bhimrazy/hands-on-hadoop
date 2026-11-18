@@ -26,6 +26,7 @@ nn hadoop jar "$JAR" wordcount /user/lab/10/input /user/lab/10/out-baseline
 nn hadoop jar "$JAR" wordcount \
   -Dmapreduce.map.memory.mb=128 -Dmapreduce.map.java.opts=-Xmx100m \
   -Dmapreduce.reduce.memory.mb=128 -Dmapreduce.reduce.java.opts=-Xmx100m \
+  -Dmapreduce.task.io.sort.mb=32 \
   /user/lab/10/input /user/lab/10/out-tuned
 
 docker compose -f compose.yaml -f "$OVERRIDE" up -d --no-deps --force-recreate resourcemanager

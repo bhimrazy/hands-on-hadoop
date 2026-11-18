@@ -135,8 +135,11 @@ hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.ja
   wordcount \
   -Dmapreduce.map.memory.mb=128 -Dmapreduce.map.java.opts=-Xmx100m \
   -Dmapreduce.reduce.memory.mb=128 -Dmapreduce.reduce.java.opts=-Xmx100m \
+  -Dmapreduce.task.io.sort.mb=32 \
   /user/lab/10/input /user/lab/10/out-tuned
 ```
+
+`io.sort.mb` shrinks each map's sort buffer from its 100 MB default. Without it the buffer alone fills the 100 MB heap and every map fails with `Java heap space`.
 
 Run the metrics loop from step 3 again in the second terminal. Now `(768 - 384) / 128 = 3` maps run side by side:
 
