@@ -1,3 +1,4 @@
+# shellcheck shell=bash
 # Helpers for labs/NN-slug/check.sh. Source it, run checks, then call summary:
 #   source /labs/_lib/check-lib.sh
 #   check_hdfs_exists /input/sample.txt "sample.txt is in HDFS" "run step 2: hdfs dfs -put ..."

@@ -8,18 +8,17 @@ USER root
 
 # Jars are baked in so notebooks need no network: spark.jars.packages would resolve them through Ivy at runtime.
 # Kafka source plus the runtime deps that /opt/spark/jars lacks, per spark-sql-kafka-0-10_2.13:4.3.0's POM.
-ARG MAVEN=https://repo1.maven.org/maven2
 ADD --chown=spark:spark --chmod=644 --checksum=sha256:3e458fbf575e8bcdb58f2f3b1a6c51b60e47a75c627f242bc6911fb04de6939b \
-    ${MAVEN}/org/apache/spark/spark-sql-kafka-0-10_2.13/4.3.0/spark-sql-kafka-0-10_2.13-4.3.0.jar /opt/spark/jars/
+    https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.13/4.3.0/spark-sql-kafka-0-10_2.13-4.3.0.jar /opt/spark/jars/
 ADD --chown=spark:spark --chmod=644 --checksum=sha256:e36eeca0a3950518567fa8d744e9948880fdc79a478baadad00e305d145d97c9 \
-    ${MAVEN}/org/apache/spark/spark-token-provider-kafka-0-10_2.13/4.3.0/spark-token-provider-kafka-0-10_2.13-4.3.0.jar /opt/spark/jars/
+    https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.13/4.3.0/spark-token-provider-kafka-0-10_2.13-4.3.0.jar /opt/spark/jars/
 ADD --chown=spark:spark --chmod=644 --checksum=sha256:014b4ef36884478a932641818b080c36a8f8e2e92dc771e800c9d2694f4f83d8 \
-    ${MAVEN}/org/apache/kafka/kafka-clients/3.9.2/kafka-clients-3.9.2.jar /opt/spark/jars/
+    https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.9.2/kafka-clients-3.9.2.jar /opt/spark/jars/
 ADD --chown=spark:spark --chmod=644 --checksum=sha256:f77a5060d6936a9144023584232f9de3f2248f1abfe156e9d31795f18770674f \
-    ${MAVEN}/org/apache/commons/commons-pool2/2.13.1/commons-pool2-2.13.1.jar /opt/spark/jars/
+    https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.13.1/commons-pool2-2.13.1.jar /opt/spark/jars/
 # Iceberg publishes no Spark 4.3 runtime yet; the 4.1 build is the newest release.
 ADD --chown=spark:spark --chmod=644 --checksum=sha256:3123c3798af642dd537230923548e013ef41cc28b6626e5225808cf5670a0f82 \
-    ${MAVEN}/org/apache/iceberg/iceberg-spark-runtime-4.1_2.13/1.12.0/iceberg-spark-runtime-4.1_2.13-1.12.0.jar /opt/spark/jars/
+    https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-4.1_2.13/1.12.0/iceberg-spark-runtime-4.1_2.13-1.12.0.jar /opt/spark/jars/
 
 # Build the venv on the image's own Python; --frozen fails if uv.lock is out of date with pyproject.toml.
 ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
@@ -28,8 +27,7 @@ ENV UV_PROJECT_ENVIRONMENT=/opt/venv \
     UV_LINK_MODE=copy \
     UV_NO_CACHE=1
 COPY pyproject.toml uv.lock /tmp/notebook/
-RUN cd /tmp/notebook \
- && uv sync --frozen --no-install-project \
+RUN uv sync --project /tmp/notebook --frozen --no-install-project \
  && rm -rf /tmp/notebook \
  && mkdir -p /home/spark /workspace \
  && chown spark:spark /home/spark /workspace \

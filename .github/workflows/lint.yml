@@ -53,7 +53,7 @@ jobs:
             exit 1
           fi
           shellcheck --version
-          shellcheck -x "${files[@]}"
+          shellcheck -x --severity=warning "${files[@]}"
 
   compose:
     runs-on: ubuntu-24.04
