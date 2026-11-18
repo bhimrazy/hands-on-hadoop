@@ -1,0 +1,78 @@
+name: platforms
+
+# GitHub's macOS runners have no Docker and its Windows runners only run Windows containers,
+# so the labs themselves run in labs.yml on Linux. This checks what learners run on every OS.
+on:
+  push:
+    branches: [main]
+  pull_request:
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: platforms-${{ github.ref }}
+  cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+jobs:
+  preflight:
+    name: ${{ matrix.name }}
+    runs-on: ${{ matrix.os }}
+    timeout-minutes: 10
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - { os: ubuntu-24.04, name: "Linux x64" }
+          - { os: ubuntu-24.04-arm, name: "Linux arm64" }
+          - { os: macos-15, name: "macOS arm64" }
+          - { os: windows-2025, name: "Windows x64" }
+    steps:
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
+        with:
+          persist-credentials: false
+
+      - name: Scripts keep LF line endings after checkout
+        shell: bash
+        run: |
+          crlf=$(git ls-files --eol | awk '$2 == "w/crlf" {print $4}' | grep -E '\.(sh|py|ya?ml|conf|properties|ipynb)$|Caddyfile|Dockerfile' || true)
+          if [ -n "$crlf" ]; then
+            echo "Checked out with CRLF:"; echo "$crlf"; exit 1
+          fi
+
+      - name: Shell scripts parse with this OS's bash
+        shell: bash
+        run: |
+          bash --version | head -n1
+          for f in scripts/preflight.sh labs/_lib/check-lib.sh labs/*/check.sh tests/labs/*.sh; do
+            bash -n "$f"
+          done
+
+      # Exit 1 is the script's own "fix this first" verdict, e.g. no Docker on macOS runners;
+      # anything higher means it crashed.
+      - name: preflight.sh
+        shell: bash
+        run: |
+          set +e
+          bash scripts/preflight.sh
+          code=$?
+          echo "exit code $code"
+          if [ "$RUNNER_OS" = Linux ]; then [ "$code" -eq 0 ]; else [ "$code" -le 1 ]; fi
+
+      - name: preflight.ps1 (PowerShell 7)
+        shell: pwsh
+        run: |
+          pwsh -NoProfile -File scripts/preflight.ps1
+          $code = $LASTEXITCODE
+          "exit code $code"
+          if ($env:RUNNER_OS -eq 'Linux') { exit [int]($code -ne 0) } else { exit [int]($code -gt 1) }
+
+      - name: preflight.ps1 (Windows PowerShell 5.1)
+        if: runner.os == 'Windows'
+        shell: powershell
+        run: |
+          powershell -NoProfile -ExecutionPolicy Bypass -File scripts\preflight.ps1
+          $code = $LASTEXITCODE
+          "exit code $code"
+          exit [int]($code -gt 1)

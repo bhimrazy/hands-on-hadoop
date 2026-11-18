@@ -27,21 +27,10 @@ jobs:
         with:
           persist-credentials: false
       - id: matrix
-        env:
-          EVENT: ${{ github.event_name }}
         run: |
           labs=$(find tests/labs -maxdepth 1 -name '*.sh' -exec basename {} .sh \; | sort | jq -R . | jq -sc .)
-          arm=false
-          if [ "$EVENT" = schedule ] || [ "$EVENT" = workflow_dispatch ]; then
-            arm=true
-          fi
-          matrix=$(jq -nc --argjson labs "$labs" --arg arm "$arm" '
-            {include: (
-              [$labs[] | {lab: ., runner: "ubuntu-24.04", arch: "x64"}]
-              + (if $arm == "true" and ($labs | length) > 0
-                 then [{lab: $labs[0], runner: "ubuntu-24.04-arm", arch: "arm64"}]
-                 else [] end)
-            )}')
+          matrix=$(jq -nc --argjson labs "$labs" '
+            {include: [$labs[] | ({lab: ., runner: "ubuntu-24.04", arch: "x64"}, {lab: ., runner: "ubuntu-24.04-arm", arch: "arm64"})]}')
           echo "matrix=$matrix" >> "$GITHUB_OUTPUT"
           echo "count=$(jq length <<<"$labs")" >> "$GITHUB_OUTPUT"
           jq . <<<"$matrix"
