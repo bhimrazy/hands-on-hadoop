@@ -5,29 +5,33 @@ Send lines into a Kafka topic, let Spark count the words as they arrive, and sav
 | | |
 |---|---|
 | ⏱ Time | 60 minutes |
-| 🧠 Docker memory | about 2.3 GB at peak (core + kafka + notebook) |
-| 🧩 Services | core + `kafka` + `notebook` |
+| 🧠 Docker memory | about 2.4 GB at peak (fits in 3 GB with swap; 4 GB is more comfortable) |
+| 🧩 Services | the core stack plus `kafka` and `notebook` (profiles `kafka` and `notebook`) |
 | Level | Advanced |
-
-<img src="../../images/kafka-streaming.svg" alt="Console producer writes lines to a Kafka topic; Spark Structured Streaming reads them in micro-batches and writes Parquet and a checkpoint to HDFS" width="720">
 
 Kafka is a log: producers append messages, readers remember how far they have read. That "how far" is called an **offset**. Spark Structured Streaming turns the log into a table that grows, and runs your query on every new chunk (a **micro-batch**).
 
+<img src="../../images/kafka-streaming.svg" alt="Console producer writes lines to a Kafka topic; Spark Structured Streaming reads them in micro-batches and writes Parquet and a checkpoint to HDFS" width="720">
+
+Spark runs in local mode in the notebook container, as in [lab 05](../05-spark-and-jupyter/README.md). The image ships the Kafka connector jars.
+
 ## Start
+
+This lab needs two add-ons, so it takes two `--profile` flags. From the repo root:
 
 ```bash
 docker compose --profile kafka --profile notebook up -d --wait
 ```
 
-Check it's up: `docker compose ps` should list `kafka` and `notebook` as `healthy`, next to the Hadoop services. The first start builds the notebook image, so allow a few minutes.
+Check it is up: `docker compose --profile "*" ps` should list `kafka` and `notebook` as `healthy`, next to the Hadoop services. If you skipped the earlier notebook labs, the first start builds the notebook image, so allow a few minutes.
 
-> This lab runs Spark in the notebook container (local mode), not on YARN. If you have a MapReduce job running at the same time, memory gets tight. Let jobs finish first.
+All commands in this lab run on your laptop. Memory is tight with two add-ons, so do not run MapReduce jobs at the same time.
 
 ## Steps
 
 ### 1. Create a topic
 
-A topic is a named log. We make one with a single partition so offsets are easy to read.
+A topic is a named log. Make one with a single partition, so offsets are easy to read.
 
 ```bash
 docker compose exec kafka /opt/kafka/bin/kafka-topics.sh \
@@ -45,12 +49,14 @@ Replication factor is 1 because there is only one broker. This broker also acts 
 
 ### 2. Produce some lines
 
-The console producer sends every line you type as one message. Copy these six lines into it:
+The console producer sends every line you type as one message. Start it:
 
 ```bash
-docker compose exec -it kafka /opt/kafka/bin/kafka-console-producer.sh \
+docker compose exec kafka /opt/kafka/bin/kafka-console-producer.sh \
   --bootstrap-server kafka:9092 --topic lines
 ```
+
+At the `>` prompt, paste these six lines and press Enter:
 
 ```text
 hadoop stores data in hdfs
@@ -61,11 +67,18 @@ hdfs keeps the streamed data
 streams of data never stop
 ```
 
-Press `Ctrl+D` to leave. The same lines are in [sample-lines.txt](sample-lines.txt) if you prefer to pipe them in (bash/zsh): `docker compose exec -T kafka /opt/kafka/bin/kafka-console-producer.sh --bootstrap-server kafka:9092 --topic lines < labs/09-kafka-streaming/sample-lines.txt`.
+Press `Ctrl+D` to leave. The same lines are in [sample-lines.txt](sample-lines.txt). In bash or zsh you can pipe them in instead of typing:
+
+```bash
+docker compose exec -T kafka /opt/kafka/bin/kafka-console-producer.sh \
+  --bootstrap-server kafka:9092 --topic lines < labs/09-kafka-streaming/sample-lines.txt
+```
+
+Do one or the other, not both, or every line is in the topic twice.
 
 ### 3. Look at offsets
 
-Kafka keeps the messages. Ask where the log ends:
+Kafka keeps the messages after they are sent. Ask where the log ends:
 
 ```bash
 docker compose exec kafka /opt/kafka/bin/kafka-get-offsets.sh \
@@ -93,13 +106,13 @@ Processed a total of 6 messages
 
 ### 4. Count words as they arrive
 
-Copy the notebook into your workspace, then open <http://jupyter.localhost> and double-click `streaming.ipynb`:
+Copy the notebook into your workspace so you can edit and save it. Then open <http://jupyter.localhost> and double-click `streaming.ipynb`.
 
 ```bash
 docker compose exec notebook cp /labs/09-kafka-streaming/streaming.ipynb /workspace/
 ```
 
-Run the cells from the top down to the first word count (**Shift+Enter** runs a cell). The query reads the topic from the earliest offset and keeps a running table in memory.
+Run the cells from the top down to the first word count (Shift+Enter runs a cell). The query reads the topic from the earliest offset and keeps a running table in memory.
 
 You should see:
 
@@ -118,13 +131,13 @@ You should see:
 +-------+-----+
 ```
 
-Now the streaming part. Produce one more line in your terminal (step 2, for example `hadoop loves data`), then run the next cell. `hadoop` and `data` each go up by one. Nothing was restarted: the same query picked up the new message.
+Now the streaming part. Start the producer from step 2 again, type one more line (for example `hadoop loves data`) and leave with `Ctrl+D`. Then run the next cell. `hadoop` and `data` each go up by one. Nothing was restarted: the same query picked up the new message. The cell after that stops the query.
 
 ### 5. Save the stream to HDFS with a checkpoint
 
 Run the "Land the raw lines in HDFS" cell. It writes Parquet files to `/user/lab/09/lines` and records its progress in `/user/lab/09/checkpoints/lines`. It uses `trigger(availableNow=True)`: handle everything that is waiting, then stop. That makes a streaming query finish, which is what you want in a lab or a test.
 
-You should see (the row count matches the lines you produced):
+Run the next cell too. It reads the Parquet files back. Between the two cells you should see (the row count matches the lines you produced):
 
 ```text
 batches in the last run: 1
@@ -137,19 +150,21 @@ Look at the result from your terminal:
 docker compose exec namenode hdfs dfs -ls /user/lab/09/lines /user/lab/09/checkpoints/lines
 ```
 
+You should see:
+
 ```text
 drwxr-xr-x   - spark supergroup          0 ... /user/lab/09/lines/_spark_metadata
--rw-r--r--   1 spark supergroup        1.1 K ... /user/lab/09/lines/part-00000-....snappy.parquet
+-rw-r--r--   1 spark supergroup        ... ... /user/lab/09/lines/part-00000-....snappy.parquet
 ...
 drwxr-xr-x   - spark supergroup          0 ... /user/lab/09/checkpoints/lines/commits
--rw-r--r--   1 spark supergroup         45 ... /user/lab/09/checkpoints/lines/metadata
+-rw-r--r--   1 spark supergroup        ... ... /user/lab/09/checkpoints/lines/metadata
 drwxr-xr-x   - spark supergroup          0 ... /user/lab/09/checkpoints/lines/offsets
 drwxr-xr-x   - spark supergroup          0 ... /user/lab/09/checkpoints/lines/sources
 ```
 
 ### 6. Stop, add data, run again
 
-Produce two more lines, then run the Parquet cell and the "rows in HDFS" cell again.
+The query has stopped. Produce two more lines, then run the Parquet cell and the "rows in HDFS" cell again.
 
 You should see:
 
@@ -160,7 +175,7 @@ rows in HDFS: 9
 
 Exactly two new rows, not nine more. The checkpoint told Spark "I already handled offsets 0 to 6", so it only read the new ones. Run the Parquet cell a third time with no new lines: no batch runs and the count stays at 9.
 
-Last cell: print `offsets/0`. It is a small text file:
+Run the last two cells. The first lists the checkpoint folder. The second prints `offsets/0`, a small text file:
 
 ```text
 v1
@@ -170,7 +185,7 @@ v1
 
 The last line says "after this batch, the next offset to read for partition 0 is 7".
 
-## What is going on
+### 7. Why no line is lost or repeated
 
 - **Offset:** a message's position in a partition. Kafka does not track who read what; the reader does.
 - **Checkpoint:** the reader's notebook. Before a batch runs, Spark writes the offsets it is about to read (`offsets/N`). After the batch's files are in place, it writes `commits/N`.
@@ -190,12 +205,13 @@ PASS  Sink log /user/lab/09/lines/_spark_metadata
 PASS  Parquet part files exist in /user/lab/09/lines
 PASS  Checkpoint offsets log
 PASS  Checkpoint commit log
+
 All 5 checks passed
 ```
 
 ## Break it on purpose
 
-Make the checkpoint lie. It remembers offset 9, so delete the topic and create a new, shorter one:
+**Make the checkpoint lie.** It remembers offset 9, so delete the topic and create a new, shorter one:
 
 ```bash
 docker compose exec kafka /opt/kafka/bin/kafka-topics.sh --bootstrap-server kafka:9092 --delete --topic lines
@@ -214,12 +230,16 @@ Spark noticed that the log is shorter than what its checkpoint says it has read,
 
 ## Going further
 
-1. **Two partitions.** Create `lines2` with `--partitions 2`, produce a few lines, and run `kafka-get-offsets.sh` on it. What do you see?
+1. Create a topic `lines2` with `--partitions 2`, produce a few lines, and run `kafka-get-offsets.sh` on it. What do you see?
+
    <details><summary>Solution</summary>
 
-   You get one line per partition, for example `lines2:0:3` and `lines2:1:3`. The console producer spreads messages over partitions. Order is only guaranteed inside one partition.
+   You get one line per partition, for example `lines2:0:3` and `lines2:1:3`. The producer spreads messages over the partitions, not always evenly. Order is only guaranteed inside one partition.
+
    </details>
-2. **Counts per minute.** Change the word count to group by `window("timestamp", "1 minute")` as well as `word`.
+
+2. Count words per minute. Change the word count to group by `window("timestamp", "1 minute")` as well as `word`.
+
    <details><summary>Solution</summary>
 
    ```python
@@ -227,9 +247,13 @@ Spark noticed that the log is shorter than what its checkpoint says it has read,
                           F.explode(F.split("line", r"\s+")).alias("word"))
              .groupBy("minute", "word").count())
    ```
+
    The `timestamp` column is when Kafka stored the message.
+
    </details>
-3. **Keep running.** Replace `availableNow=True` with `processingTime="10 seconds"` and drop `awaitTermination()`. Produce lines while it runs, then call `.stop()`.
+
+3. Keep a query running. Replace `availableNow=True` with `processingTime="10 seconds"` and drop `awaitTermination()`. Produce lines while it runs, then stop it.
+
    <details><summary>Solution</summary>
 
    ```python
@@ -238,7 +262,9 @@ Spark noticed that the log is shorter than what its checkpoint says it has read,
         .option("checkpointLocation", f"{BASE}/checkpoints/lines-live")
         .trigger(processingTime="10 seconds").start())
    ```
+
    Check `q.status` and `q.lastProgress`, and stop it with `q.stop()` when you are done.
+
    </details>
 
 ## Troubleshooting
@@ -254,9 +280,12 @@ More in [docs/troubleshooting.md](../../docs/troubleshooting.md).
 
 ## Clean up
 
+Lab 10 uses only the core stack, so stop this one:
+
 ```bash
-docker compose --profile "*" down        # keeps HDFS and Kafka data
-docker compose --profile "*" down -v     # also wipes them
+docker compose --profile "*" down
 ```
 
-This is the last add-on lab. Next: [Lab 10: Tuning YARN](../10-tuning-yarn/README.md).
+Your HDFS files and Kafka messages stay. Add `-v` to wipe everything.
+
+Next: [Lab 10, Tuning YARN](../10-tuning-yarn/README.md).

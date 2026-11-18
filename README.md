@@ -25,7 +25,7 @@ bash scripts/preflight.sh        # Windows PowerShell: .\scripts\preflight.ps1
 docker compose up -d --wait
 ```
 
-The first start downloads the images. Afterwards it takes about 20 seconds. When the command returns, HDFS is ready to write to. Open <http://hdfs.localhost> and you should see the NameNode overview with one live DataNode.
+`preflight` checks that Docker is running and has enough memory. The first start downloads the images. Later starts take well under a minute. When the command returns, HDFS is ready to write to. Open <http://hdfs.localhost> and you should see the NameNode overview with one live DataNode.
 
 Then go to **[Lab 01: HDFS basics](labs/01-hdfs-basics/README.md)**.
 
@@ -35,7 +35,7 @@ Then go to **[Lab 01: HDFS basics](labs/01-hdfs-basics/README.md)**.
   <img src="images/architecture.svg" alt="Your browser reaches every service through a Caddy proxy on 127.0.0.1:80 by *.localhost name. The core runs HDFS and YARN; add-ons start only when you ask for them." width="760">
 </p>
 
-The **core** (HDFS and YARN) starts by default. Each **add-on** is a Compose profile you switch on for the labs that need it.
+The **core** (HDFS and YARN) starts by default. Each **add-on** is a Compose profile you switch on for the labs that need it: `history`, `cluster`, `notebook`, `hive` or `kafka`.
 
 | Open | What it is | Needs |
 |---|---|---|
@@ -67,9 +67,9 @@ The **core** (HDFS and YARN) starts by default. Each **add-on** is a Compose pro
 | 09 | [Kafka streaming into HDFS](labs/09-kafka-streaming/README.md) | Advanced | `kafka` + `notebook` | 60 min |
 | 10 | [Tuning YARN](labs/10-tuning-yarn/README.md) | Advanced | | 45 min |
 
-Every lab follows the same shape: **Start → Steps with expected output → Check yourself → Break it on purpose → Going further → Clean up.** Solutions are folded away until you open them.
+Every lab follows the same shape: **Start → Steps with expected output → Check yourself → Break it on purpose → Going further → Troubleshooting → Clean up.** Solutions are folded away until you open them.
 
-To check your work at any point:
+Each lab has a script that checks your work. For lab 01:
 
 ```bash
 docker compose exec namenode bash /labs/01-hdfs-basics/check.sh
@@ -88,13 +88,13 @@ PASS  numbers.txt is split into 3 blocks
 | I want to… | Run |
 |---|---|
 | Start the core | `docker compose up -d --wait` |
-| Add an add-on | `docker compose --profile notebook up -d --build --wait` |
+| Start the core plus an add-on | `docker compose --profile notebook up -d --wait` |
 | Open a shell with `hdfs`, `yarn` and `mapred` | `docker compose exec namenode bash` |
 | See what's running | `docker compose --profile "*" ps` |
 | Stop everything, keep data | `docker compose --profile "*" down` |
 | Stop and wipe all data | `docker compose --profile "*" down -v` |
 
-Use `--profile "*"` when stopping. A plain `down` leaves add-on containers running.
+Use `--profile "*"` when stopping. A plain `down` leaves add-on containers running. Each lab's **Start** section has the exact command for that lab.
 
 ## Memory
 
@@ -102,7 +102,7 @@ Use `--profile "*"` when stopping. A plain `down` leaves add-on containers runni
   <img src="images/memory-budget.svg" alt="The core idles around 1.25 GB and peaks around 2.2 GB. Core plus any one add-on fits in a 3 GB Docker VM; two add-ons need about 4 GB." width="760">
 </p>
 
-The core plus **one** add-on fits in 3 GB. To run two add-ons together, give Docker about 4 GB. [docs/memory.md](docs/memory.md) has the per-service numbers and how to change Docker's memory on Mac, Windows and Linux.
+The core plus **one** add-on fits in 3 GB. To run two add-ons together, give Docker about 4 GB. Lab 09 is the only lab that needs two. It fits in 3 GB but leans on swap. [docs/memory.md](docs/memory.md) has the per-service numbers and how to change Docker's memory on Mac, Windows and Linux.
 
 ## Good to know
 
@@ -116,8 +116,9 @@ Start with [docs/troubleshooting.md](docs/troubleshooting.md). It is organised b
 
 ## How it's tested
 
-- **Every push and pull request:** each lab's solution runs end to end on a fresh stack on GitHub's x64 runners, followed by the lab's own check. Linting covers the workflows, Dockerfile, shell scripts, Compose file and links.
-- **Nightly:** the same on arm64 runners.
+- **Labs, on every push and pull request:** each lab's solution runs end to end on a fresh stack, then the lab's own check, on both x64 and arm64 Linux runners. On arm64 the Hadoop image runs under emulation, just as on Apple Silicon.
+- **Platforms:** the preflight scripts and shell scripts are checked on Linux, macOS and Windows (bash 3.2, PowerShell 5.1 and 7), including that a Windows checkout keeps LF line endings. GitHub's macOS and Windows runners can't run these Linux containers, so the labs themselves run on Linux.
+- **Lint:** workflows, Dockerfile, shell scripts, Compose file and links.
 - **Supply chain:** images and actions are pinned by digest or commit SHA. Dependabot proposes updates after a 7-day cooldown.
 
 ## Contributing

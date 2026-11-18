@@ -6,7 +6,7 @@ Run word count twice, once in Java and once in Python, and watch YARN run it.
 |---|---|
 | ⏱ Time | 45 minutes |
 | 🧠 Docker memory | about 2.2 GB at peak |
-| 🧩 Services | `namenode`, `datanode`, `resourcemanager`, `nodemanager`, `proxy` (the core stack) |
+| 🧩 Services | the core stack (`namenode`, `datanode`, `resourcemanager`, `nodemanager`, `proxy`) |
 | Level | Beginner |
 
 **MapReduce** is a way to count things in a huge pile of data. Each machine counts its own part (**map**). The partial counts are grouped by word (**shuffle**). Then one place adds them up (**reduce**).
@@ -27,7 +27,7 @@ docker compose up -d --wait
 
 Check it is up: open <http://yarn.localhost>. The **Active Nodes** count should be `1`.
 
-Open a shell in the `namenode` container. Every command below runs there.
+Open a shell in the `namenode` container. Every command in **Steps** runs there.
 
 ```bash
 docker compose exec namenode bash
@@ -37,7 +37,7 @@ docker compose exec namenode bash
 
 ### 1. Upload the input
 
-The story is a short text with no punctuation, so every word is easy to count.
+A job reads its input from HDFS, so the text has to be there first. The story is a short text with no punctuation, so every word is easy to count.
 
 ```bash
 hdfs dfsadmin -safemode wait
@@ -47,7 +47,7 @@ hdfs dfs -put /labs/02-yarn-and-mapreduce/data/story.txt /lab02/input/
 
 ### 2. Run the Java word count
 
-Hadoop ships with example jobs. Start the job, then go straight to step 3 in your browser.
+Hadoop ships with a jar of example jobs. `wordcount` takes an input folder and an output folder. The output folder must not exist yet. Start the job, then go straight to step 3 in your browser.
 
 ```bash
 hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.jar \
@@ -57,17 +57,19 @@ hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.ja
 The first job takes about 45 seconds, longer on Apple Silicon. You should see (trimmed):
 
 ```
-INFO mapreduce.Job: The url to track the job: http://yarn.localhost:80/proxy/application_1763460000000_0001/
-INFO mapreduce.Job: Running job: job_1763460000000_0001
+INFO mapreduce.Job: The url to track the job: http://yarn.localhost:80/proxy/application_..._0001/
+INFO mapreduce.Job: Running job: job_..._0001
 INFO mapreduce.Job:  map 0% reduce 0%
 INFO mapreduce.Job:  map 100% reduce 0%
 INFO mapreduce.Job:  map 100% reduce 100%
-INFO mapreduce.Job: Job job_1763460000000_0001 completed successfully
+INFO mapreduce.Job: Job job_..._0001 completed successfully
 ```
+
+A long list of counters follows. Lab 03 shows how to read them.
 
 ### 3. Watch it in the YARN UI
 
-Open <http://yarn.localhost>. Click the application ID to see its state: `ACCEPTED`, then `RUNNING`, then `FINISHED`.
+Open <http://yarn.localhost>. Your job is the newest row in the table. Reload the page to watch its **State** go from `ACCEPTED` to `RUNNING` to `FINISHED`.
 
 Look for two things:
 
@@ -77,6 +79,8 @@ Look for two things:
 The job is tiny, so you will see one map task and one reduce task. A big file would get one map task per block.
 
 ### 4. Read the result
+
+The job wrote its output to HDFS. `sort -k2,2nr` orders the lines by the count in the second column, biggest first.
 
 ```bash
 hdfs dfs -ls /lab02/out-java
@@ -135,6 +139,8 @@ You should see the same `completed successfully` line. This runs `hadoop-streami
 
 ### 6. Compare the two outputs
 
+`diff` prints nothing when two inputs are equal, so `same` only appears if the Java and Python results match.
+
 ```bash
 diff <(hdfs dfs -cat /lab02/out-java/part-r-00000) \
      <(hdfs dfs -cat /lab02/out-python/part-00000) && echo "same"
@@ -150,8 +156,10 @@ Two languages, one answer. The Python output is `part-00000`, with no `r`, becau
 
 ## Check yourself
 
+In the namenode shell:
+
 ```bash
-docker compose exec namenode bash /labs/02-yarn-and-mapreduce/check.sh
+bash /labs/02-yarn-and-mapreduce/check.sh
 ```
 
 You should see:
@@ -163,8 +171,11 @@ PASS  Java output counts the word elephant
 PASS  the Python streaming job finished
 PASS  Python output counts the word elephant
 PASS  Java and Python give the same counts
+
 All 6 checks passed
 ```
+
+From your laptop's terminal, the same check is `docker compose exec namenode bash /labs/02-yarn-and-mapreduce/check.sh`.
 
 ## Break it on purpose
 
@@ -181,11 +192,7 @@ You should see:
 org.apache.hadoop.mapred.FileAlreadyExistsException: Output directory hdfs://namenode:8020/lab02/out-java already exists
 ```
 
-The job stops before it starts, and nothing shows up in the YARN UI. Hadoop refuses to overwrite old results. Delete the folder, or pick a new name:
-
-```bash
-hdfs dfs -rm -r /lab02/out-java
-```
+The job stops before it starts, and nothing new shows up in the YARN UI. Hadoop refuses to overwrite old results. To run a job again, pick a new output folder, or delete the old one first with `hdfs dfs -rm -r <folder>`. Keep `/lab02/out-java` for now: the check script and lab 05 use it.
 
 ## Going further
 
@@ -225,13 +232,13 @@ hdfs dfs -rm -r /lab02/out-java
 | Job stays at `ACCEPTED` | The NodeManager is out of memory or still starting. Wait a minute, then check <http://yarn.localhost> for running jobs. See [docs/memory.md](../../docs/memory.md). |
 | `Streaming Command Failed!` with `exit 127` | Python was not found. Use `python3` in `-mapper` and `-reducer`, not `python`. |
 | `Name node is in safe mode` | Run `hdfs dfsadmin -safemode wait`, then retry. |
-| A link in the YARN UI does not open | Use the `*.localhost` links from the repo README. If a link points at a bare container name, run `docker compose logs nodemanager` instead. |
+| A **Logs** or **History** link in the YARN UI returns a 502 error | Those links go to the history server, which is not running yet. Lab 03 starts it. |
 
 More in [docs/troubleshooting.md](../../docs/troubleshooting.md).
 
 ## Clean up
 
-Leave the stack running for the next lab, or stop it:
+Type `exit` to leave the namenode shell. Leave the stack running for the next lab, or stop it:
 
 ```bash
 docker compose --profile "*" down

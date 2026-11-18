@@ -79,15 +79,15 @@ The rule: `FILE.XML_property.name: value` becomes a `<property>` in `FILE.xml`. 
 |---|---|---|---|---|
 | core | `fs.defaultFS` | `hdfs://localhost:9000` | `hdfs://namenode:8020` | NameNode is its own container; 8020 is the default port. |
 | core | `hadoop.tmp.dir` | `/usr/local/hadoop/tmp` | default | Storage folders are set explicitly instead. |
-| hdfs | `dfs.replication` | `1` | `1` (`2` in lab 04) | One DataNode in the core. |
+| hdfs | `dfs.replication` | `1` | `1` | One DataNode in the core. Lab 04 asks for 2 per file. |
 | hdfs | `dfs.namenode.name.dir`, `dfs.datanode.data.dir` | under `/usr/local/hadoop/hdfs` | `/data/namenode`, `/data/datanode` | On Docker volumes, so data is kept between runs. |
 | hdfs | `dfs.permissions.enabled` | `false` | `false` | No `chown` needed to write. |
-| hdfs | `dfs.datanode.hostname` | not set | `localhost` | Lets the HDFS UI's download links work from your computer. |
+| hdfs | `dfs.datanode.hostname` | not set | `dn1.localhost` (`dn2`, `dn3` in lab 04) | Lets the HDFS UI's download links work from your computer. |
 | hdfs | `dfs.namenode.safemode.extension` | 30 s | 5 s | Short safe mode after a restart. |
 | mapred | `mapreduce.framework.name` | `yarn` | `yarn` | Jobs run on YARN. |
 | mapred | map/reduce memory | `512` MB, `-Xmx410m` | `256` MB, `-Xmx200m` | Fits YARN's 768 MB. |
 | mapred | ApplicationMaster memory | default (1536 MB) | `384` MB, `-Xmx288m` | The default wouldn't fit. |
-| mapred | `jobhistory.*` | `localhost:10020`, `:19888` | set by the `history` profile | No History Server in the core, to save memory. |
+| mapred | `jobhistory.*` | `localhost:10020`, `:19888` | `history.localhost:10020`, `:80` | The History Server itself only runs with the `history` profile, to save memory. |
 | yarn | `yarn.resourcemanager.hostname` | `localhost` (plus each address) | `resourcemanager` | All RM addresses follow from the hostname. |
 | yarn | `aux-services` | `mapreduce_shuffle` | `mapreduce_shuffle` | Needed for MapReduce. |
 | yarn | NodeManager memory / cores | `1024` MB / `1` | `768` MB / `2` | Fits the 1 GB container limit. |

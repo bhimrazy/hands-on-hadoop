@@ -21,7 +21,7 @@ Each container has a hard memory limit, so one greedy process can't take down th
 | `resourcemanager` | core | 512 MB | peak about 415 MB |
 | `nodemanager` | core | 1 GB (768 MB lent to jobs) | peak about 870 MB |
 | `proxy` (Caddy) | core | 64 MB | about 15 MB |
-| `historyserver` | `history` | see `compose.yaml` | 270 to 320 MB |
+| `historyserver` | `history` | 384 MB | 270 to 320 MB |
 | `datanode2`, `datanode3` | `cluster` | 256 MB each | about 150 to 200 MB each |
 | `hiveserver2` | `hive` | 1 GB | 700 to 900 MB |
 | `kafka` | `kafka` | 512 MB | 330 MB idle, peak 480 MB |

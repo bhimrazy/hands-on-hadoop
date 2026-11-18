@@ -40,12 +40,12 @@ docker compose --profile "*" down
 | Job stays `ACCEPTED` | No memory free for its ApplicationMaster, or another job holds the cluster. | Wait for the other job, or see [lab 10](../labs/10-tuning-yarn/README.md). If nothing else is running, check [memory](memory.md). |
 | `Invalid resource request ... maximum allowed allocation` | A container asked for more than `yarn.scheduler.maximum-allocation-mb` (768). | Lower the request, for example `-Dmapreduce.map.memory.mb=256`. |
 | `Container killed ... exit code 137` | Out of memory: Docker or the kernel killed it. | Give Docker more memory, run one job at a time. |
-| `Container killed on request. Exit code is 143` | YARN stopped the container (finished, killed by you, or over its memory). | Read the task log: `yarn logs -applicationId <id>` (needs lab 03's History profile) or `docker compose logs nodemanager`. |
+| `Container killed on request. Exit code is 143` | YARN stopped the container (finished, killed by you, or over its memory). | Read the task log: `yarn logs -applicationId <id>` (see [lab 03](../labs/03-job-history-and-logs/README.md)) or `docker compose logs nodemanager`. |
 | `Output directory ... already exists` | MapReduce won't overwrite. | `hdfs dfs -rm -r <folder>`, rerun. |
 | `Application failed 2 times due to AM Container ... exited with exitCode: 1` | The ApplicationMaster crashed. | Open the application's page, then its log; usual cause is memory or a wrong `HADOOP_MAPRED_HOME`. |
-| Links in the YARN UI point at `nodemanager:8042` | An internal name, not reachable from your browser. | Use the `*.localhost` URLs in the lab, or `docker compose logs`. |
+| A **Logs** or **History** link in the YARN UI returns 502 | The link goes to the history server, which only runs with the `history` profile. | `docker compose --profile history up -d --wait`, or read the logs with `yarn logs`. |
 | NodeManager gone from **Nodes** | It was killed under memory pressure. | `docker compose restart nodemanager`. |
-| Everything is very slow on a Mac with Apple Silicon | The Hadoop image is Intel-only and is emulated. | See the Mac row below. |
+| Everything is very slow on a Mac with Apple Silicon | The Hadoop image is Intel-only and is emulated. | See [Windows and Mac specifics](#windows-and-mac-specifics). |
 
 ## Notebook and Spark
 
@@ -56,18 +56,19 @@ docker compose --profile "*" down
 | Kernel dies / restarts | Out of memory. | Close other notebooks; give Docker more memory. |
 | `Connection refused` to `namenode:8020` | HDFS isn't up yet. | `docker compose ps namenode`. |
 | `PATH_ALREADY_EXISTS` / `path ... already exists` | Writing to a folder that exists. | `.mode("overwrite")` or remove it with `hdfs dfs -rm -r`. |
-| Edits to a lab notebook are lost | `/labs` is read-only. | **File → Save Notebook As** into `workspace/`. |
+| A lab notebook isn't in JupyterLab's file browser | JupyterLab only shows `workspace/`. | Copy it in: `docker compose exec notebook cp /labs/<lab>/<name>.ipynb /workspace/`. |
+| `Cannot call methods on a stopped SparkContext` | The notebook's last cell ran `spark.stop()`. | Run the notebook's first code cell again. |
 | `ModuleNotFoundError` for a package | Not in the image. | `%pip install <package>` in a cell (lasts until the container is recreated), or add it to `notebook/pyproject.toml` and rebuild. |
 
 ## Hive
 
 | Symptom | Likely cause | Fix |
 |---|---|---|
-| beeline: `Connection refused` | HiveServer2 takes 1 to 2 minutes to start. | `docker compose logs -f hiveserver2` until it says it is listening; retry. |
+| beeline: `Connection refused` | HiveServer2 takes 1 to 2 minutes to start. | `docker compose --profile hive up -d --wait` returns when it is ready; retry. |
 | My Hive query isn't in the YARN UI | Expected. Queries run inside HiveServer2 (Tez local mode). | Nothing to fix; see lab 07. |
 | `Another instance of Derby may have already booted the database` | HiveServer2 was killed uncleanly. | `docker compose restart hiveserver2`; if it persists, `down -v`. |
 | `Table already exists` | You ran `CREATE` twice. | `CREATE TABLE IF NOT EXISTS` or `DROP TABLE`. |
-| `Permission denied` / `Unable to move source` | Folder in HDFS belongs to someone else. | Use a path under `/user/lab/`. |
+| `Permission denied` / `Unable to move source` | Folder in HDFS belongs to someone else. | Use a path under `/user/lab/` and run `hdfs dfs -chmod -R a+rwx /user/lab` in the namenode shell (lab 07, step 1). |
 
 ## Kafka
 

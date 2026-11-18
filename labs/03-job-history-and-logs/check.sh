@@ -8,7 +8,7 @@ if hdfs dfs -ls -R /app-logs 2>/dev/null | grep -q "application_"; then
   pass "aggregated logs are stored in /app-logs"
 else
   fail "aggregated logs are stored in /app-logs" \
-    "start the history profile: docker compose --profile history up -d --wait"
+    "run the wordcount in step 1 and wait for it to finish; logs are collected when a job ends"
 fi
 
 if hdfs dfs -ls -R /tmp/hadoop-yarn/staging/history/done 2>/dev/null | grep -q "\.jhist"; then

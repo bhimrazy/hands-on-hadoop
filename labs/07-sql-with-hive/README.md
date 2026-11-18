@@ -5,40 +5,38 @@ Query files in HDFS with plain SQL: external tables, ORC tables, partitions, GRO
 | | |
 |---|---|
 | ⏱ Time | 30 minutes |
-| 🧠 Docker memory | about 2.4 GB peak (core + hive) |
-| 🧩 Services | namenode, datanode, resourcemanager, nodemanager, proxy, **hiveserver2** |
+| 🧠 Docker memory | about 2.4 GB at peak |
+| 🧩 Services | the core stack plus `hiveserver2` (profile `hive`) |
 | Level | Intermediate |
-
-<img src="../../images/hive-query.svg" alt="A beeline client sends SQL to HiveServer2, which reads table definitions from the metastore and data files from HDFS" width="720">
-
-## The big idea
 
 Hive turns SQL into jobs that read and write files in HDFS. It keeps two things apart:
 
-- **The data** is just files in HDFS (CSV, ORC, Parquet...).
+- **The data** is files in HDFS (CSV, ORC, Parquet...).
 - **The table** is a definition (column names, types, folder) kept in the **metastore**.
 
-An **external table** points at a folder that already exists. Drop it and the files stay.
-A **managed table** is owned by Hive and lives under `/user/hive/warehouse`. Drop it and the files go too.
+<img src="../../images/hive-query.svg" alt="A beeline client sends SQL to HiveServer2, which reads table definitions from the metastore and data files from HDFS" width="720">
 
-**Where do queries run?** Inside the HiveServer2 container, using Tez in *local mode*. They do **not** run on YARN, so you will not see them in <http://yarn.localhost>.
-The reason is Java: Hive 4 needs Java 21 and the Hadoop image's YARN nodes run Java 11, so Hive code cannot start inside a YARN container. The queries still read and write real HDFS files. Only the compute is local.
+An **external table** points at a folder that already exists. Drop it and the files stay. A **managed table** is owned by Hive and lives under `/user/hive/warehouse`. Drop it and the files go too.
 
-The metastore here is an embedded Derby database inside HiveServer2. That is fine for learning, and it means your tables survive `docker compose down` (but not `down -v`).
+**Queries run inside the HiveServer2 container**, using Tez in local mode. They do not run on YARN, so you will not see them in <http://yarn.localhost>. The reason is Java: Hive 4 needs Java 21 and the Hadoop image runs Java 11, so Hive code cannot start inside a YARN container. The queries still read and write real HDFS files. On a real cluster the same SQL would run as Tez jobs on YARN.
+
+The metastore here is a small Derby database inside HiveServer2. Your tables survive `docker compose down`, but not `down -v`.
 
 ## Start
+
+From the repo root:
 
 ```bash
 docker compose --profile hive up -d --wait
 ```
 
-Check it's up: open <http://hive.localhost>. You should see the HiveServer2 web page.
+HiveServer2 can take a minute or two to become healthy. Check it is up: open <http://hive.localhost>. You should see the HiveServer2 web page.
 
 ## Steps
 
 ### 1. Put the CSV files into HDFS
 
-The lab ships a small `sales.csv` (300 orders) and `customers.csv` (40 customers).
+The lab ships a small `sales.csv` (300 orders) and `customers.csv` (40 customers). Each goes into its own folder, because a Hive table points at a folder, not a file. Run this on your laptop:
 
 ```bash
 docker compose exec namenode bash -c '
@@ -62,7 +60,7 @@ The `chmod` lets the Hive user read and write under `/user/lab`.
 
 ### 2. Open beeline
 
-Beeline is Hive's command line SQL client.
+Beeline is Hive's command line SQL client. It runs inside the `hiveserver2` container.
 
 ```bash
 docker compose exec hiveserver2 beeline -u jdbc:hive2://localhost:10000 -n hive
@@ -75,11 +73,11 @@ Connected to: Apache Hive (version 4.2.1)
 0: jdbc:hive2://localhost:10000>
 ```
 
-Type SQL ending with `;`. Type `!quit` to leave. Beeline's own commands start with `!`.
+Type SQL ending with `;`. Beeline's own commands start with `!` and take no `;`. Type `!quit` to leave.
 
 ### 3. An external table over the CSV
 
-The SQL files are in `labs/07-sql-with-hive/sql/`. You can paste statements, or run a whole file from the prompt:
+The SQL for each step is in [`sql/`](sql/). You can paste statements, or run a whole file from the beeline prompt with `!run`:
 
 ```text
 !run /labs/07-sql-with-hive/sql/01-external-table.sql
@@ -98,15 +96,7 @@ LOCATION '/user/lab/07/sales'
 TBLPROPERTIES ('skip.header.line.count' = '1');
 ```
 
-No data moved. Hive only remembered "table `sales_raw` = the CSV files in this folder". The script ends by counting rows:
-
-```text
-+-------------+
-| rows_in_csv |
-+-------------+
-| 300         |
-+-------------+
-```
+No data moved. Hive only recorded "table `sales_raw` = the CSV files in this folder". The file also defines `customers_raw` the same way, and ends by counting rows. You should see `rows_in_csv` with the value `300`.
 
 ### 4. CTAS to an ORC table
 
@@ -116,6 +106,8 @@ CTAS means *create table as select*. This copies the CSV into a managed table st
 !run /labs/07-sql-with-hive/sql/02-ctas-orc.sql
 ```
 
+The main statement is:
+
 ```sql
 CREATE TABLE sales_orc STORED AS ORC AS
 SELECT order_id, customer_id, product, country, quantity, unit_price,
@@ -123,15 +115,17 @@ SELECT order_id, customer_id, product, country, quantity, unit_price,
 FROM sales_raw;
 ```
 
-While it runs, notice the log lines mention Tez and local mode. Open <http://yarn.localhost>: no new application. That is the "runs inside HiveServer2" point from above.
+The file ends with a row count (300 again) and the new table's columns. Open <http://yarn.localhost>: there is no new application, because the query ran inside HiveServer2.
 
 ### 5. Find the files with DESCRIBE FORMATTED
 
-```text
+`DESCRIBE FORMATTED` prints everything the metastore knows about a table, including where its files are.
+
+```sql
 DESCRIBE FORMATTED sales_orc;
 ```
 
-Scroll to the middle of the output:
+Look for these rows in the middle of the output:
 
 ```text
 | Location:       | hdfs://namenode:8020/user/hive/warehouse/sales_orc |
@@ -139,17 +133,19 @@ Scroll to the middle of the output:
 | InputFormat:    | org.apache.hadoop.hive.ql.io.orc.OrcInputFormat    |
 ```
 
-Now look at the real files from a second terminal:
+Now look at the real files from a second terminal on your laptop:
 
 ```bash
 docker compose exec namenode hdfs dfs -ls -R /user/hive/warehouse/sales_orc
 ```
 
+You should see one ORC file:
+
 ```text
--rw-r--r--   3 hive hadoop       5421 ... /user/hive/warehouse/sales_orc/000000_0
+-rw-r--r--   1 hive ...        ... ... /user/hive/warehouse/sales_orc/000000_0
 ```
 
-That file is the table. Do the same for the external one: `DESCRIBE FORMATTED sales_raw;` shows `EXTERNAL_TABLE` and your `/user/lab/07/sales` folder.
+That file is the table. Do the same for the external one: `DESCRIBE FORMATTED sales_raw;` shows `EXTERNAL_TABLE` and your `/user/lab/07/sales` folder. [`05-find-the-files.sql`](sql/05-find-the-files.sql) runs both.
 
 ### 6. A partitioned table
 
@@ -159,29 +155,17 @@ A **partition** is a sub-folder per value of a column. A query with `WHERE count
 !run /labs/07-sql-with-hive/sql/03-partitions.sql
 ```
 
-You should see:
+The file creates `sales_by_country`, fills it from `sales_raw` and lists its partitions. You should see five, from `country=Brazil` to `country=Nepal`.
 
-```text
-+------------------+
-|    partition     |
-+------------------+
-| country=Brazil   |
-| country=India    |
-| country=Japan    |
-| country=Kenya    |
-| country=Nepal    |
-+------------------+
-```
-
-And in HDFS:
+In HDFS each partition is a folder:
 
 ```bash
 docker compose exec namenode hdfs dfs -ls /user/hive/warehouse/sales_by_country
 ```
 
 ```text
-drwxr-xr-x   - hive hadoop          0 ... /user/hive/warehouse/sales_by_country/country=Brazil
-drwxr-xr-x   - hive hadoop          0 ... /user/hive/warehouse/sales_by_country/country=India
+Found 5 items
+drwxr-xr-x   - hive ...          0 ... /user/hive/warehouse/sales_by_country/country=Brazil
 ...
 ```
 
@@ -191,16 +175,19 @@ drwxr-xr-x   - hive hadoop          0 ... /user/hive/warehouse/sales_by_country/
 !run /labs/07-sql-with-hive/sql/04-group-by-and-join.sql
 ```
 
-Revenue per country, then the five biggest customers (a JOIN with `customers_raw`), then a new ORC table `top_products`.
+The file runs three queries: revenue per country, the five biggest customers (a JOIN with `customers_raw`), and a new ORC table `top_products`. The first result is:
 
 ```text
 +----------+---------+----------+
 | country  | orders  | revenue  |
 +----------+---------+----------+
-| ...      | ...     | ...      |
+| Kenya    | 91      | 3887.0   |
+| Nepal    | 74      | 3078.1   |
+| Brazil   | 72      | 2991.6   |
+| Japan    | 35      | 1748.8   |
+| India    | 28      | 1615.1   |
++----------+---------+----------+
 ```
-
-(Numbers above are illustrative.)
 
 Leave beeline with `!quit`.
 
@@ -218,38 +205,47 @@ PASS  customers.csv is in /user/lab/07/customers
 PASS  sales_orc has ORC files in the warehouse
 PASS  sales_by_country has a country=Nepal partition folder
 PASS  top_products has files in the warehouse
+
 All 5 checks passed
 ```
 
 ## Break it on purpose
 
-Drop an external table and a managed table, then look at HDFS. First make a managed copy so you do not lose your lab tables:
+**Drop a managed table, then an external one, and look at HDFS.** Open beeline again (step 2). Make a managed copy first, so your lab tables stay safe:
 
 ```sql
 CREATE TABLE sales_copy STORED AS ORC AS SELECT * FROM sales_raw;
 DROP TABLE sales_copy;
 ```
 
+In your second terminal:
+
 ```bash
 docker compose exec namenode hdfs dfs -ls /user/hive/warehouse/sales_copy
 ```
 
-You should see `No such file or directory`: dropping a managed table deleted its files.
+You should see `No such file or directory`. Dropping a managed table deleted its files.
 
-Now try the same with an external table (copy the definition under a new name):
+Now do the same with a second external table over the sales folder:
 
 ```sql
-CREATE EXTERNAL TABLE sales_view (order_id INT) LOCATION '/user/lab/07/sales'
+CREATE EXTERNAL TABLE sales_peek (order_id INT)
   ROW FORMAT DELIMITED FIELDS TERMINATED BY ','
+  LOCATION '/user/lab/07/sales'
   TBLPROPERTIES ('skip.header.line.count' = '1');
-DROP TABLE sales_view;
+DROP TABLE sales_peek;
 ```
 
-Run `hdfs dfs -ls /user/lab/07/sales`. `sales.csv` is still there. This is the reason people use external tables for data they do not want Hive to delete.
+```bash
+docker compose exec namenode hdfs dfs -ls /user/lab/07/sales
+```
+
+`sales.csv` is still there. This is why people use external tables for data they do not want Hive to delete.
 
 ## Going further
 
 1. Which product sold the most units in Japan? Use the partitioned table.
+
    <details><summary>Solution</summary>
 
    ```sql
@@ -257,16 +253,25 @@ Run `hdfs dfs -ls /user/lab/07/sales`. `sales.csv` is still there. This is the r
    FROM sales_by_country WHERE country = 'Japan'
    GROUP BY product ORDER BY units DESC LIMIT 1;
    ```
+
+   `notebook`, with 28 units. Hive only reads the `country=Japan` folder.
+
    </details>
+
 2. Run `EXPLAIN` on a GROUP BY query and find the Tez vertices (Map 1, Reducer 2).
+
    <details><summary>Solution</summary>
 
    ```sql
    EXPLAIN SELECT country, COUNT(*) FROM sales_orc GROUP BY country;
    ```
+
    The plan lists `Tez` with `Vertices:`. A vertex is a stage, like map and reduce in MapReduce.
+
    </details>
-3. Query lab 05 or 06 data. Create an external table over `/user/lab/06/formats/parquet` with `STORED AS PARQUET`.
+
+3. Query the lab 06 data, if you still have it. Create an external table over `/user/lab/06/formats/parquet` with `STORED AS PARQUET`.
+
    <details><summary>Solution</summary>
 
    ```sql
@@ -275,13 +280,14 @@ Run `hdfs dfs -ls /user/lab/07/sales`. `sales.csv` is still there. This is the r
    STORED AS PARQUET LOCATION '/user/lab/06/formats/parquet';
    SELECT country, AVG(amount) FROM orders_parquet GROUP BY country;
    ```
+
    </details>
 
 ## Troubleshooting
 
 | Symptom | Fix |
 |---|---|
-| `Could not open client transport` / connection refused | HiveServer2 takes up to a minute to start. Run `docker compose ps` and wait for `healthy`. |
+| `Could not open client transport` / connection refused | HiveServer2 can take a minute or two to start. Run `docker compose ps` and wait for `healthy`. |
 | `Permission denied` on `/user/lab` or the warehouse | Re-run the `hdfs dfs -chmod -R a+rwx /user/lab` command from step 1. |
 | `Unable to create a terminal` | Run beeline with plain `docker compose exec` (not `-T`, not piped). It needs a terminal. |
 | A query seems stuck for a few seconds | Normal. Each query starts a Tez session inside HiveServer2. The first one is slowest. |
@@ -291,10 +297,12 @@ More in [docs/troubleshooting.md](../../docs/troubleshooting.md).
 
 ## Clean up
 
+Leave beeline with `!quit`, then:
+
 ```bash
 docker compose --profile "*" down
 ```
 
-Tables and data stay in Docker volumes. Add `-v` to wipe everything.
+Your tables and HDFS files stay. Add `-v` to wipe everything.
 
-Next: [Lab 08: Iceberg tables](../08-iceberg-tables/README.md).
+Next: [Lab 08, Iceberg tables](../08-iceberg-tables/README.md).

@@ -5,21 +5,26 @@ Read how much room your NodeManager has, work out how many tasks fit, make a job
 | | |
 |---|---|
 | ⏱ Time | 45 minutes |
-| 🧠 Docker memory | about 2.2 GB at peak (core only) |
-| 🧩 Services | core (`namenode`, `datanode`, `resourcemanager`, `nodemanager`, `proxy`) |
+| 🧠 Docker memory | about 2.2 GB at peak |
+| 🧩 Services | the core stack (`namenode`, `datanode`, `resourcemanager`, `nodemanager`, `proxy`) |
 | Level | Advanced |
-
-<img src="../../images/yarn-memory.svg" alt="The NodeManager's 768 MB split into a 384 MB ApplicationMaster container, one 256 MB map container and 128 MB left over" width="720">
 
 YARN hands out memory in **containers**. A job asks for some, and the **ResourceManager** says yes only if the **NodeManager** has room. When it doesn't, the job waits. That wait is what you'll see here.
 
+<img src="../../images/yarn-memory.svg" alt="The NodeManager's 768 MB split into a 384 MB ApplicationMaster container, one 256 MB map container and 128 MB left over" width="720">
+
 ## Start
 
+Stop anything left over from another lab, then start the core stack. From the repo root:
+
 ```bash
+docker compose --profile "*" down
 docker compose up -d --wait
 ```
 
-Check it's up: <http://yarn.localhost> opens, and `docker compose ps` shows all services running. Open a shell for the commands below:
+Check it is up: open <http://yarn.localhost>. The **Active Nodes** count should be `1`.
+
+Open a shell in the `namenode` container. Steps 1 to 5 run there.
 
 ```bash
 docker compose exec namenode bash
@@ -29,7 +34,7 @@ docker compose exec namenode bash
 
 ### 1. Read the cluster's capacity
 
-Open <http://yarn.localhost>. Look at the cluster metrics at the top and at **Nodes** in the left menu. Or ask the ResourceManager's REST API from the shell:
+Before you tune anything, find out how much there is to hand out. Open <http://yarn.localhost> and look at the cluster metrics at the top and at **Nodes** in the left menu. Or ask the ResourceManager's REST API from the shell:
 
 ```bash
 curl -s http://yarn.localhost/ws/v1/cluster/metrics | jq '.clusterMetrics | {totalMB, totalVirtualCores, availableMB}'
@@ -85,7 +90,7 @@ hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.ja
   wordcount /user/lab/10/input /user/lab/10/out-baseline
 ```
 
-Open a **second terminal** (`docker compose exec namenode bash`) and watch YARN while the job runs:
+Open a **second namenode shell** (`docker compose exec namenode bash` in a new terminal) and watch YARN while the job runs:
 
 ```bash
 for i in $(seq 1 10); do
@@ -104,9 +109,9 @@ You should see something like:
 
 Two containers (AM and one map) use 640 MB. 128 MB is free, which is too small for another 256 MB map, so five wait in `containersPending`. Also look at the **Applications** page: the job has one running attempt, and as each map finishes the next one starts. The first job takes a minute or two.
 
-### 4. Break it on purpose
+### 4. Break it on purpose: ask for too much
 
-Ask for an ApplicationMaster bigger than the biggest container YARN allows:
+This lab breaks things in the middle, because the error explains the limits from step 1. Ask for an ApplicationMaster bigger than the biggest container YARN allows:
 
 ```bash
 hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.jar \
@@ -124,7 +129,7 @@ maximum allowed allocation=<memory:768, vCores:2>, please note that maximum allo
 calculated by scheduler based on maximum resource of registered NodeManagers ...
 ```
 
-Read it left to right: *what you asked for* (1024 MB) and *the ceiling* (768 MB). Nothing is wrong with the cluster; the request can never fit, so YARN says no at the door instead of letting it wait forever. The same message appears if a map or reduce request (`-Dmapreduce.map.memory.mb=1024`) is too big; it shows up in the ApplicationMaster's log instead of your terminal.
+Read it left to right: what you asked for (1024 MB) and the ceiling (768 MB). Nothing is wrong with the cluster. The request can never fit, so YARN refuses it at once instead of letting it wait forever. A map or reduce request that is too big (`-Dmapreduce.map.memory.mb=1024`) gets the same message, but in the ApplicationMaster's log instead of your terminal.
 
 ### 5. Tune the job, not the cluster
 
@@ -147,13 +152,13 @@ Run the metrics loop from step 3 again in the second terminal. Now `(768 - 384) 
 {"allocatedMB":768,"availableMB":0,"containersAllocated":4,"containersPending":3}
 ```
 
-Compare **Elapsed** for both jobs on the Applications page. The tuned job should finish sooner, though the AM start-up time is the same, so the win is smaller than you might expect. Make containers too small and tasks run out of heap (`OutOfMemoryError`, or exit code 143/137): trading memory for parallelism has a floor.
+Compare **Elapsed** for both jobs on the Applications page now. Step 6 restarts the ResourceManager, which clears that list. The tuned job should finish sooner, but the AM start-up time is the same, so the win is smaller than you might expect. Make containers too small and tasks run out of heap (`OutOfMemoryError`, or exit code 143 or 137). You can only trade memory for parallelism down to what a task needs.
 
 ### 6. Tune the cluster with a compose override
 
 Some settings belong to the ResourceManager, so the job can't change them. Here we add a second **queue**. Queues split the cluster between groups of users or kinds of work: `default` (interactive) and `batch` (long jobs).
 
-The file [compose.override-example.yaml](compose.override-example.yaml) sets the queues as environment variables on the `resourcemanager`. Apply it by naming both files, then recreate only the ResourceManager (type `exit` first to leave the shell; this runs on your computer):
+The file [compose.override-example.yaml](compose.override-example.yaml) sets the queues as environment variables on the `resourcemanager`. Type `exit` to leave the namenode shell: the rest of this step runs on your laptop. Apply the override by naming both files, and recreate only the ResourceManager:
 
 ```bash
 docker compose -f compose.yaml -f labs/10-tuning-yarn/compose.override-example.yaml \
@@ -172,23 +177,22 @@ You should see `1` after 10 to 30 seconds (it can be `0` for a moment). Now look
 docker compose exec namenode yarn queue -status batch
 ```
 
+You should see (trimmed):
+
 ```text
-Queue Information :
 Queue Name : batch
 	State : RUNNING
 	Capacity : 50.0%
-	Current Capacity : .0%
 	Maximum Capacity : 100.0%
-	Default Node Label expression : <DEFAULT_PARTITION>
-	Accessible Node Labels : *
-	Preemption : disabled
 ```
 
 Open **Scheduler** in the YARN UI: two bars, `default` and `batch`, each guaranteed half of the 768 MB but allowed to borrow up to all of it while the other is idle.
 
-> To go back, run plain `docker compose up -d --force-recreate resourcemanager`. Without both `-f` flags compose uses only `compose.yaml`. The override is not applied by accident because its name is not `compose.override.yaml`.
+Compose only applies the override when you name it with `-f`. A plain `docker compose up` uses `compose.yaml` alone.
 
 ### 7. Submit to a queue
+
+Open the namenode shell again (`docker compose exec namenode bash`) and send a job to the new queue with `mapreduce.job.queuename`:
 
 ```bash
 hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.jar \
@@ -196,14 +200,14 @@ hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.ja
   /user/lab/10/input /user/lab/10/out-queue
 ```
 
-Run it in a shell again (`docker compose exec namenode bash`). In the Applications page, the **Queue** column says `batch`. While it runs, the Scheduler page shows the `batch` bar filling up.
-
-Now submit two jobs at once, one without `queuename` (goes to `default`) and one to `batch`, from two terminals. Both get a share, and you can see each queue's usage separately.
+On the Applications page, the **Queue** column says `batch`. While the job runs, the Scheduler page shows the `batch` bar filling up.
 
 ## Check yourself
 
+Run the check while the override is still applied. In the namenode shell:
+
 ```bash
-docker compose exec namenode bash /labs/10-tuning-yarn/check.sh
+bash /labs/10-tuning-yarn/check.sh
 ```
 
 You should see:
@@ -215,25 +219,38 @@ PASS  Tuned job finished (out-tuned)
 PASS  Job in the batch queue finished (out-queue)
 PASS  Scheduler has a queue named batch
 PASS  A finished application ran in queue batch
+
 All 6 checks passed
 ```
 
+## Break it on purpose
+
+Step 4 is this lab's break: a request above `yarn.scheduler.maximum-allocation-mb` is refused at once.
+
 ## Going further
 
-1. **Why does a job sit in `ACCEPTED`?** Start two wordcounts at once with the default config. What do you see, and why?
+1. Start two wordcounts at once, from two namenode shells, with different output folders. One sits in `ACCEPTED`. Why?
+
    <details><summary>Solution</summary>
 
-   The second job usually stays in `ACCEPTED` until the first one finishes. A job only goes to `RUNNING` when its ApplicationMaster has a container. The scheduler also limits how much of a queue ApplicationMasters may hold (`yarn.scheduler.capacity.maximum-am-resource-percent`, 10 percent by default), and always lets at least the first one in. Other causes: not enough free memory for the AM, or a queue at its maximum capacity.
+   A job only goes to `RUNNING` when its ApplicationMaster has a container. The scheduler limits how much of a queue ApplicationMasters may hold (`yarn.scheduler.capacity.maximum-am-resource-percent`, 10 percent by default) and always lets at least the first one in. So the second job waits until the first finishes. That is a good thing here: two 384 MB ApplicationMasters would fill the 768 MB and leave no room for any map. Other causes of `ACCEPTED`: not enough free memory for the AM, or a queue at its maximum capacity.
+
    </details>
-2. **Rounding.** Add `YARN-SITE.XML_yarn.scheduler.minimum-allocation-mb: "256"` to the override, recreate the ResourceManager, and run the tuned job (128 MB maps). What memory does each container get?
+
+2. Add `YARN-SITE.XML_yarn.scheduler.minimum-allocation-mb: "256"` to the override, recreate the ResourceManager, and run the tuned job (128 MB maps) into a new output folder. What memory does each container get?
+
    <details><summary>Solution</summary>
 
-   256 MB, because requests are rounded up to a multiple of the minimum. The 3-at-a-time speed-up from step 5 goes away. `allocatedMB` in the metrics loop shows it.
+   256 MB, because requests are rounded up to a multiple of the minimum. The three-at-a-time speed-up from step 5 goes away. `allocatedMB` in the metrics loop shows it.
+
    </details>
-3. **Fewer reducers.** Add `-Dmapreduce.job.reduces=1` and compare **Counters** (reached from the job's page) with a run using `-Dmapreduce.job.reduces=2`. Does the output change?
+
+3. Run wordcount with `-Dmapreduce.job.reduces=2`. Does the output change?
+
    <details><summary>Solution</summary>
 
-   With 2 reducers you get `part-r-00000` and `part-r-00001`, each holding some of the words. Total counts are the same. On a one-node cluster extra reducers add start-up cost and no speed.
+   You get `part-r-00000` and `part-r-00001`, each holding some of the words. Total counts are the same. On a one-node cluster extra reducers add start-up cost and no speed.
+
    </details>
 
 ## Troubleshooting
@@ -241,6 +258,7 @@ All 6 checks passed
 | Symptom | Fix |
 |---|---|
 | `curl: Could not resolve host: yarn.localhost` | Run it inside the namenode shell, or open the URL in your browser. |
+| `docker: command not found` | You are inside the namenode shell. Type `exit` first. |
 | After step 6 `activeNodes` stays `0` | Wait a minute. If still 0, `docker compose restart nodemanager`. |
 | A job in the `batch` queue stays in `ACCEPTED` or its maps never start | The override must include the `user-limit-factor` lines; with the default of 1 a user can't use more than the queue's own half. |
 | `Queue 'batch' does not exist` | The override wasn't applied. Check you passed both `-f` files and recreated `resourcemanager`. |
@@ -250,9 +268,12 @@ More in [docs/troubleshooting.md](../../docs/troubleshooting.md).
 
 ## Clean up
 
+Type `exit` to leave the namenode shell, then:
+
 ```bash
-docker compose --profile "*" down        # keeps HDFS data
-docker compose --profile "*" down -v     # also wipes it
+docker compose --profile "*" down
 ```
+
+Your HDFS files stay. Add `-v` to wipe them. The next `docker compose up -d --wait` starts the ResourceManager without the override, so the `batch` queue is gone.
 
 You've finished the labs. Go back to the [learning path](../../README.md), or look at [how this maps to a manual VM install](../../docs/vm-install-comparison.md).

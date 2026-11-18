@@ -5,11 +5,11 @@ Find out what a finished job did, and find the error when a job fails.
 | | |
 |---|---|
 | ⏱ Time | 30 minutes |
-| 🧠 Docker memory | about 2.4 GB at peak (core plus one add-on) |
+| 🧠 Docker memory | about 2.4 GB at peak |
 | 🧩 Services | the core stack plus `historyserver` (profile `history`) |
 | Level | Intermediate |
 
-When a job ends, YARN forgets it. Two things keep its story alive:
+When a job ends, its containers and their logs go away, and YARN keeps only a one-line summary. Two things keep the full story:
 
 - The **JobHistory server** keeps a record of every finished job: counters, task times, status.
 - **Log aggregation** copies each container's logs into HDFS (`/app-logs`) when the job ends.
@@ -18,15 +18,15 @@ When a job ends, YARN forgets it. Two things keep its story alive:
 
 ## Start
 
-This lab needs the history server on top of the core stack.
+This lab needs the history server on top of the core stack. It is an add-on, and you switch add-ons on with `--profile`. From the repo root:
 
 ```bash
 docker compose --profile history up -d --wait
 ```
 
-Check it is up: open <http://history.localhost>. You should see the JobHistory page with an empty job table.
+Check it is up: open <http://history.localhost>. You should see the JobHistory page. The job table is empty if this is your first job since the history server started.
 
-Open a shell in the `namenode` container. Every command below runs there.
+Open a shell in the `namenode` container. Every command in **Steps** runs there.
 
 ```bash
 docker compose exec namenode bash
@@ -35,6 +35,8 @@ docker compose exec namenode bash
 ## Steps
 
 ### 1. Run a job so there is a history
+
+Upload the two input files for this lab, then run the word count from lab 02 on the first one.
 
 ```bash
 hdfs dfsadmin -safemode wait
@@ -77,29 +79,29 @@ yarn application -list -appStates FINISHED
 You should see:
 
 ```
-Application-Id                  Application-Name  ...  State     Final-State  Progress  Tracking-URL
-application_1763460000000_0001  word count        ...  FINISHED  SUCCEEDED    100%      http://history.localhost:80/jobhistory/job/job_1763460000000_0001
+Application-Id           Application-Name  ...  State     Final-State  Progress  Tracking-URL
+application_..._0001     word count        ...  FINISHED  SUCCEEDED    100%      http://history.localhost:80/jobhistory/job/job_..._0001
 ```
 
-Then fetch its logs. Use your own ID.
+Then fetch its logs. Replace `<application id>` with your own, for example `application_1763460000000_0001`.
 
 ```bash
-yarn logs -applicationId application_1763460000000_0001 | head -30
+yarn logs -applicationId <application id> | head -30
 ```
 
 You should see (trimmed):
 
 ```
-Container: container_1763460000000_0001_01_000001 on nodemanager.localhost_41559
+Container: container_..._0001_01_000001 on nodemanager.localhost_...
 LogAggregationType: AGGREGATED
 LogType:syslog
 LogContents:
-2026-11-18 10:20:01,115 INFO [main] org.apache.hadoop.mapreduce.v2.app.MRAppMaster: ...
+... INFO [main] org.apache.hadoop.mapreduce.v2.app.MRAppMaster: ...
 ```
 
 Container `_000001` is the ApplicationMaster. The other containers ran the map and reduce tasks. If you see `Log aggregation has not completed or is not enabled`, wait ten seconds and run it again.
 
-The `.jhist` file behind the history UI is also in HDFS:
+Both kinds of record are plain files in HDFS. The first command finds the `.jhist` file behind the history UI. The second lists the aggregated logs.
 
 ```bash
 hdfs dfs -ls -R /tmp/hadoop-yarn/staging/history/done | grep jhist
@@ -133,7 +135,7 @@ mapred streaming \
 You should see (trimmed):
 
 ```
-INFO mapreduce.Job: Task Id : attempt_1763460000000_0002_m_000000_0, Status : FAILED
+INFO mapreduce.Job: Task Id : attempt_..._0002_m_000000_0, Status : FAILED
 Error: java.lang.RuntimeException: PipeMapRed.waitOutputThreads(): subprocess failed with code 1
 ...
 Job failed as tasks failed. failedMaps:1 failedReduces:0
@@ -154,13 +156,13 @@ yarn application -list -appStates ALL | grep orders-bad
 Then ask for the `stderr` logs only. This is where Python prints its traceback.
 
 ```bash
-yarn logs -applicationId application_1763460000000_0002 -log_files stderr
+yarn logs -applicationId <application id> -log_files stderr
 ```
 
-You should see:
+You should see, among the output:
 
 ```
-Container: container_1763460000000_0002_01_000002 on nodemanager.localhost_41559
+Container: container_..._0002_01_000002 on nodemanager.localhost_...
 LogType:stderr
 LogContents:
 Traceback (most recent call last):
@@ -168,6 +170,8 @@ Traceback (most recent call last):
     print(f"{product}\t{float(price)}")
 ValueError: could not convert string to float: 'n/a'
 ```
+
+The file path in your traceback may be longer.
 
 That is the whole story: line 6 of the mapper, and the bad value `n/a`.
 
@@ -201,8 +205,10 @@ The `ruler` row is skipped. Its note is in the job's `stderr` log, which is also
 
 ## Check yourself
 
+In the namenode shell:
+
 ```bash
-docker compose exec namenode bash /labs/03-job-history-and-logs/check.sh
+bash /labs/03-job-history-and-logs/check.sh
 ```
 
 You should see:
@@ -214,19 +220,23 @@ PASS  the history server has job history files
 PASS  the failing job orders-bad ran and failed
 PASS  the failed job wrote no result files
 PASS  the fixed job wrote totals per product
+
 All 6 checks passed
 ```
 
 ## Break it on purpose
 
-**Ask for logs while the job is still running.** Start a job, and in a second terminal run `yarn logs` at once.
+**Ask for logs while the job is still running.** Start a job in the namenode shell:
 
 ```bash
 hadoop jar /opt/hadoop/share/hadoop/mapreduce/hadoop-mapreduce-examples-3.4.2.jar pi 2 1000
 ```
 
+While it runs, open a second namenode shell (`docker compose exec namenode bash` in a new terminal). Find the running job's ID and ask for its logs:
+
 ```bash
-yarn logs -applicationId <the new application id>
+yarn application -list
+yarn logs -applicationId <application id>
 ```
 
 You should see something like:
@@ -243,7 +253,7 @@ or a message that log aggregation has not completed. Aggregation happens when th
 
    <details><summary>Solution</summary>
 
-   Start `pi 10 10000` in one terminal. In another:
+   Start the `pi` example with `pi 10 10000` in one namenode shell. In another:
 
    ```bash
    yarn application -list
@@ -282,10 +292,12 @@ More in [docs/troubleshooting.md](../../docs/troubleshooting.md).
 
 ## Clean up
 
+Type `exit` to leave the namenode shell, then:
+
 ```bash
 docker compose --profile "*" down
 ```
 
-Keep `--profile "*"` even if you only started `history`, so nothing is left running. Your HDFS files and job history stay.
+A plain `down` would leave the history server running, because it belongs to a profile. Your HDFS files and job history stay.
 
 Next: [Lab 04, Replication and failure](../04-replication-and-failure/README.md). It starts a different set of services, so stop this stack first.

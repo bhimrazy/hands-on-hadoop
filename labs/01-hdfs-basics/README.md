@@ -6,7 +6,7 @@ Put a file into HDFS, see how it is cut into blocks, and learn to read the clust
 |---|---|
 | ⏱ Time | 30 minutes |
 | 🧠 Docker memory | about 1.5 GB |
-| 🧩 Services | `namenode`, `datanode`, `proxy` (the core stack) |
+| 🧩 Services | the core stack (this lab uses `namenode`, `datanode` and `proxy`) |
 | Level | Beginner |
 
 HDFS stores big files by cutting them into **blocks**. The **NameNode** remembers which blocks make up each file. The **DataNodes** keep the blocks.
@@ -15,19 +15,23 @@ HDFS stores big files by cutting them into **blocks**. The **NameNode** remember
 
 ## Start
 
-From the repo root:
+New here? Do the [Quick start](../../README.md#quick-start) first. It clones the repo and checks that Docker is ready.
+
+In a terminal, from the repo root:
 
 ```bash
 docker compose up -d --wait
 ```
 
-Check it is up: open <http://hdfs.localhost>. The page should say **active** and **Safemode is off**.
+Check it is up: open <http://hdfs.localhost>. The page should say **active** near the top and **Safemode is off** under Summary.
 
-Then open a shell inside the `namenode` container. Every command below runs there.
+Then open a shell inside the `namenode` container. The Hadoop commands are installed there, so every command in **Steps** runs in this shell.
 
 ```bash
 docker compose exec namenode bash
 ```
+
+The prompt changes: you are now inside the container. Type `exit` when you want to go back to your laptop's terminal.
 
 ## Steps
 
@@ -66,12 +70,14 @@ The `1` after the permissions is the **replication factor**: one copy of each bl
 
 ### 3. Read it back
 
+`-cat` prints a file. `-get` copies it out of HDFS. The container's `/workspace` folder is the repo's `workspace/` folder on your laptop, so the copy lands there.
+
 ```bash
 hdfs dfs -cat /lab01/sample.txt
 hdfs dfs -get /lab01/sample.txt /workspace/sample-copy.txt
 ```
 
-You should see the four lines of text. The second command copies the file out of HDFS into `workspace/` on your laptop.
+You should see the four lines of text, and a new `workspace/sample-copy.txt` on your laptop.
 
 ### 4. Look at it in the web UI
 
@@ -81,7 +87,7 @@ This is the same data you just read in the shell. The shell and the UI both ask 
 
 ### 5. Make a file that needs more than one block
 
-The default block size is 128 MB, so a small file is always one block. To see blocks without a huge file, make a 2 MB file and ask HDFS for 1 MB blocks.
+The default block size is 128 MB, so a small file is always one block. To see blocks without a huge file, make a 2.6 MB file of numbers and ask HDFS for 1 MB blocks.
 
 ```bash
 seq 1 400000 > /workspace/numbers.txt
@@ -89,17 +95,17 @@ ls -lh /workspace/numbers.txt
 hdfs dfs -D dfs.blocksize=1m -put /workspace/numbers.txt /lab01/
 ```
 
-You should see:
+You should see a line that ends like this (`put` prints nothing when it works):
 
 ```
--rw-r--r-- 1 hadoop users 2.2M Nov 18 10:05 /workspace/numbers.txt
+... 2.6M ... /workspace/numbers.txt
 ```
 
 `-D dfs.blocksize=1m` changes the setting for this one command only.
 
 ### 6. Count the blocks with fsck
 
-`fsck` asks the NameNode how a file is stored.
+`fsck` (file system check) asks the NameNode how a file is stored.
 
 ```bash
 hdfs fsck /lab01/numbers.txt -files -blocks -locations
@@ -108,22 +114,23 @@ hdfs fsck /lab01/numbers.txt -files -blocks -locations
 You should see (trimmed):
 
 ```
-/lab01/numbers.txt 2288895 bytes, replicated: replication=1, 3 block(s):  OK
-0. BP-...:blk_..._1002 len=1048576 Live_repl=1 [DatanodeInfoWithStorage[...]]
-1. BP-...:blk_..._1002 len=1048576 Live_repl=1 [DatanodeInfoWithStorage[...]]
-2. BP-...:blk_..._1002 len=191743 Live_repl=1 [DatanodeInfoWithStorage[...]]
+/lab01/numbers.txt 2688895 bytes, replicated: replication=1, 3 block(s):  OK
+0. BP-...:blk_... len=1048576 Live_repl=1  [DatanodeInfoWithStorage[...]]
+1. BP-...:blk_... len=1048576 Live_repl=1  [DatanodeInfoWithStorage[...]]
+2. BP-...:blk_... len=591743 Live_repl=1  [DatanodeInfoWithStorage[...]]
 ...
- Total blocks (validated):	3 (avg. block size 762965 B)
- Minimally replicated blocks:	3 (100.0 %)
- Under-replicated blocks:	0 (0.0 %)
+ Total blocks (validated):	3 (avg. block size 896298 B)
+...
 The filesystem under path '/lab01/numbers.txt' is HEALTHY
 ```
 
-Three blocks: two full 1 MB blocks and a small last one. The last block only takes the space it needs.
+Three blocks: two full 1 MB blocks (`len=1048576`) and a smaller last one. The last block only takes the space it needs.
 
 Open the file in the web UI again. The block list now has three entries.
 
 ### 7. See what is using the space
+
+`-ls -R` lists a folder and everything under it. `-du` shows the size of each file, and `-df` shows how full HDFS is.
 
 ```bash
 hdfs dfs -ls -R /lab01
@@ -134,20 +141,22 @@ hdfs dfs -df -h /
 You should see (sizes will differ a little):
 
 ```
+-rw-r--r--   1 hadoop supergroup    2688895 ... /lab01/numbers.txt
 -rw-r--r--   1 hadoop supergroup        196 ... /lab01/sample.txt
--rw-r--r--   1 hadoop supergroup    2288895 ... /lab01/numbers.txt
+2.6 M  2.6 M  /lab01/numbers.txt
 196    196    /lab01/sample.txt
-2.2 M  2.2 M  /lab01/numbers.txt
-Filesystem                  Size    Used  Available  Use%
-hdfs://namenode:8020  ...
+Filesystem              Size  Used  Available  Use%
+hdfs://namenode:8020     ...
 ```
 
 `-du` prints two sizes: the file size, and the size including all replicas. They match here because replication is 1.
 
 ## Check yourself
 
+Every lab has a script that checks your work. In the namenode shell:
+
 ```bash
-docker compose exec namenode bash /labs/01-hdfs-basics/check.sh
+bash /labs/01-hdfs-basics/check.sh
 ```
 
 You should see:
@@ -157,8 +166,11 @@ PASS  sample.txt is in /lab01
 PASS  /lab01/sample.txt has the sample text
 PASS  numbers.txt is in /lab01
 PASS  numbers.txt is split into 3 blocks
+
 All 4 checks passed
 ```
+
+A `FAIL` line comes with a hint that says which step to repeat. From your laptop's terminal, the same check is `docker compose exec namenode bash /labs/01-hdfs-basics/check.sh`.
 
 ## Break it on purpose
 
@@ -196,7 +208,7 @@ Both messages come from the NameNode. It checks the path before any DataNode is 
 
    <details><summary>Solution</summary>
 
-   Three: 2 MB, 2 MB and 1 MB.
+   Three: 2 MB, 2 MB and about 1.2 MB.
 
    ```bash
    seq 1 800000 > /workspace/five.txt
@@ -219,7 +231,7 @@ Both messages come from the NameNode. It checks the path before any DataNode is 
 
    </details>
 
-3. Open <http://hdfs.localhost> and find the **Datanodes** tab. How much capacity does the DataNode report?
+3. Open <http://hdfs.localhost> and find the **Datanodes** tab. How much capacity does the DataNode report? (After exercise 2 the check script fails, as it should: the files are gone.)
 
 ## Troubleshooting
 
@@ -228,16 +240,19 @@ Both messages come from the NameNode. It checks the path before any DataNode is 
 | `Name node is in safe mode` | HDFS just started. Run `hdfs dfsadmin -safemode wait`, then retry. |
 | `hdfs.localhost` does not load | Run `docker compose ps`. If `proxy` or `namenode` is not running, run `docker compose up -d --wait` again. |
 | `put: ... is less than the minimum block size` | The block size must be at least 1 MB. Use `-D dfs.blocksize=1m`. |
-| Download from the UI fails | Reload the page and try again. The link goes through `dn1.localhost`. |
+| Download from the UI fails | Reload the page and try again. The link goes through `dn1.localhost`. Or use `hdfs dfs -get` as in step 3. |
+| `docker: command not found` | You are still inside the namenode shell. Type `exit`, then run the `docker compose` command on your laptop. |
 
 More in [docs/troubleshooting.md](../../docs/troubleshooting.md).
 
 ## Clean up
 
-Leave the stack running for the next lab, or stop it. Your HDFS files stay either way.
+Type `exit` to leave the namenode shell. Leave the stack running for the next lab, or stop it from the repo root. Your HDFS files stay either way.
 
 ```bash
 docker compose --profile "*" down
 ```
+
+`--profile "*"` also stops the add-ons that later labs start, so this one command always stops everything.
 
 Next: [Lab 02, YARN and MapReduce](../02-yarn-and-mapreduce/README.md).

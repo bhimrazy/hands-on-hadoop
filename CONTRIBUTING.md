@@ -8,7 +8,7 @@ Each lab lives in `labs/NN-slug/` and has three parts that must agree with each 
 
 | Part | What it is |
 |---|---|
-| `README.md` | The walkthrough: start, steps with expected output, check yourself, break it, clean up |
+| `README.md` | The walkthrough. Sections, in order: Start, Steps, Check yourself, Break it on purpose, Going further, Troubleshooting, Clean up |
 | `check.sh` | The "check yourself" script. It runs inside the namenode container and prints `PASS` or `FAIL` per check |
 | `tests/labs/NN.sh` | The CI driver. It does the lab's steps non-interactively, then runs `check.sh` |
 
@@ -21,11 +21,11 @@ The first lines of `tests/labs/NN.sh` say which stack CI starts:
 
 `profiles` is empty for the core stack. `services` is optional and limits what `up` starts.
 
-If you change a step in a README, change the matching line in `tests/labs/NN.sh` and `check.sh`.
+If you change a step in a README, change the matching line in `tests/labs/NN.sh` and `check.sh`. The hints in `check.sh` refer to steps by number, so keep them in sync when you renumber.
 
 ## Run the linters locally
 
-CI runs the same checks as `lint.yml`. The quick ones are easy to run yourself:
+CI runs these checks from `lint.yml`. The quick ones are easy to run yourself:
 
 ```bash
 docker compose config -q
@@ -59,7 +59,8 @@ Use releases that are at least 7 days old, unless it is a security fix. Dependab
 ## Style
 
 - Folders and files use kebab-case. Line endings are LF (`.gitattributes` handles this).
-- Short sentences. Show the output the reader should see.
+- Short sentences. Each step says why, gives the command, then shows the output the reader should see. Trim output to the lines that stay the same on every run.
+- Notebooks are copied from `/labs` into `/workspace` before use, and every lab stops with `docker compose --profile "*" down`.
 - Code comments explain why, not what. Most code needs none.
 
 ## Commits and pull requests
