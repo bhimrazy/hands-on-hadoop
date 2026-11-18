@@ -19,7 +19,7 @@ It also keeps data in memory between steps, so it is usually much faster than Ma
 
 **Spark runs in local mode here.** That means the whole Spark program (driver and workers) runs as threads inside the notebook container. It does not use YARN.
 
-Why? The Hadoop image in this repo runs Java 11, and Spark 4.3 needs Java 17 or newer. So Spark lives in its own container with its own Java, and talks to HDFS over the network.
+Why? The Hadoop image in this repo runs Java 11, and Spark 4 needs Java 17 or newer. So Spark lives in its own container with its own Java, and talks to HDFS over the network.
 
 What changes on a real cluster? Almost nothing in your code. You would start Spark with `--master yarn`. YARN would then give Spark containers on many machines, just like it did for MapReduce in lab 02. The DataFrame code stays the same.
 
@@ -68,7 +68,7 @@ spark = (
 You should see:
 
 ```text
-Spark 4.3.x
+Spark 4.1.x
 Spark UI: http://spark.localhost
 ```
 

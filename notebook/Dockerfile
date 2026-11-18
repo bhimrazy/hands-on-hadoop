@@ -1,22 +1,22 @@
 FROM ghcr.io/astral-sh/uv:0.11.8@sha256:3b7b60a81d3c57ef471703e5c83fd4aaa33abcd403596fb22ab07db85ae91347 AS uv
 
-FROM spark:4.3.0-python3@sha256:3f34ea24b3aa6de84c942d463657d203d08455d24e62f2df3ff16d7367bff200
+FROM spark:4.1.3-python3@sha256:23b155b98033eae36e503b11f613e2091caf30722a599521965925dc2756460a
 
 COPY --from=uv /uv /usr/local/bin/uv
 
 USER root
 
 # Jars are baked in so notebooks need no network: spark.jars.packages would resolve them through Ivy at runtime.
-# Kafka source plus the runtime deps that /opt/spark/jars lacks, per spark-sql-kafka-0-10_2.13:4.3.0's POM.
-ADD --chown=spark:spark --chmod=644 --checksum=sha256:3e458fbf575e8bcdb58f2f3b1a6c51b60e47a75c627f242bc6911fb04de6939b \
-    https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.13/4.3.0/spark-sql-kafka-0-10_2.13-4.3.0.jar /opt/spark/jars/
-ADD --chown=spark:spark --chmod=644 --checksum=sha256:e36eeca0a3950518567fa8d744e9948880fdc79a478baadad00e305d145d97c9 \
-    https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.13/4.3.0/spark-token-provider-kafka-0-10_2.13-4.3.0.jar /opt/spark/jars/
-ADD --chown=spark:spark --chmod=644 --checksum=sha256:014b4ef36884478a932641818b080c36a8f8e2e92dc771e800c9d2694f4f83d8 \
-    https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.9.2/kafka-clients-3.9.2.jar /opt/spark/jars/
-ADD --chown=spark:spark --chmod=644 --checksum=sha256:f77a5060d6936a9144023584232f9de3f2248f1abfe156e9d31795f18770674f \
-    https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.13.1/commons-pool2-2.13.1.jar /opt/spark/jars/
-# Iceberg publishes no Spark 4.3 runtime yet; the 4.1 build is the newest release.
+# Kafka source plus the runtime deps that /opt/spark/jars lacks, per spark-sql-kafka-0-10_2.13:4.1.3's POM.
+ADD --chown=spark:spark --chmod=644 --checksum=sha256:cb31ffd9c8f5527dba061db8af671d295562092e4f3f5ff42fc249fab8a8fde6 \
+    https://repo1.maven.org/maven2/org/apache/spark/spark-sql-kafka-0-10_2.13/4.1.3/spark-sql-kafka-0-10_2.13-4.1.3.jar /opt/spark/jars/
+ADD --chown=spark:spark --chmod=644 --checksum=sha256:0535a111d7d11b2859c0a0548d5c8d172c6925f9b8d041d0f0dd38ddc5a3497c \
+    https://repo1.maven.org/maven2/org/apache/spark/spark-token-provider-kafka-0-10_2.13/4.1.3/spark-token-provider-kafka-0-10_2.13-4.1.3.jar /opt/spark/jars/
+ADD --chown=spark:spark --chmod=644 --checksum=sha256:7568b998572d256f0b7bc0afdc1b7a2588b8b08415c62ce314c864a6851ae9d9 \
+    https://repo1.maven.org/maven2/org/apache/kafka/kafka-clients/3.9.1/kafka-clients-3.9.1.jar /opt/spark/jars/
+ADD --chown=spark:spark --chmod=644 --checksum=sha256:5273c8bc8c0dca2211175c0d27efbd7228efae99689aac001a8e1ef8e872e9ef \
+    https://repo1.maven.org/maven2/org/apache/commons/commons-pool2/2.12.1/commons-pool2-2.12.1.jar /opt/spark/jars/
+# Iceberg runtimes are tied to a Spark minor version, and 4.1 is the newest one Iceberg has released for.
 ADD --chown=spark:spark --chmod=644 --checksum=sha256:3123c3798af642dd537230923548e013ef41cc28b6626e5225808cf5670a0f82 \
     https://repo1.maven.org/maven2/org/apache/iceberg/iceberg-spark-runtime-4.1_2.13/1.12.0/iceberg-spark-runtime-4.1_2.13-1.12.0.jar /opt/spark/jars/
 
