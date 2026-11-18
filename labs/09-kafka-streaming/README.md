@@ -4,8 +4,8 @@ Send lines into a Kafka topic, let Spark count the words as they arrive, and sav
 
 | | |
 |---|---|
-| ⏱ Time | 60 min |
-| 🧠 Docker memory | about 3 GB (measured peak 2.3 GB) |
+| ⏱ Time | 60 minutes |
+| 🧠 Docker memory | about 2.3 GB at peak (core + kafka + notebook) |
 | 🧩 Services | core + `kafka` + `notebook` |
 | Level | Advanced |
 

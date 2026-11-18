@@ -4,8 +4,8 @@ Read how much room your NodeManager has, work out how many tasks fit, make a job
 
 | | |
 |---|---|
-| ⏱ Time | 45 min |
-| 🧠 Docker memory | about 3 GB (core only, peak 2.2 GB) |
+| ⏱ Time | 45 minutes |
+| 🧠 Docker memory | about 2.2 GB at peak (core only) |
 | 🧩 Services | core (`namenode`, `datanode`, `resourcemanager`, `nodemanager`, `proxy`) |
 | Level | Advanced |
 

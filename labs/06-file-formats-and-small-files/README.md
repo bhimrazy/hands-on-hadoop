@@ -1,4 +1,4 @@
-# Lab 06: file formats and small files
+# Lab 06: File formats and small files
 
 See why Parquet and ORC beat CSV, and why a pile of tiny files hurts HDFS.
 
