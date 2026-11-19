@@ -7,6 +7,11 @@ hdfs dfsadmin -safemode wait
 hdfs dfs -mkdir -p /lab01
 hdfs dfs -put -f /labs/01-hdfs-basics/data/sample.txt /lab01/
 hdfs dfs -cat /lab01/sample.txt
+echo "This is a sample file" > /workspace/localfile.txt
+hdfs dfs -put -f /workspace/localfile.txt /lab01/
+echo "A second line, added later" > /workspace/more.txt
+hdfs dfs -appendToFile /workspace/more.txt /lab01/localfile.txt
+hdfs dfs -cat /lab01/localfile.txt
 seq 1 400000 > /workspace/numbers.txt
 hdfs dfs -D dfs.blocksize=1m -put -f /workspace/numbers.txt /lab01/
 hdfs dfs -ls -R /lab01

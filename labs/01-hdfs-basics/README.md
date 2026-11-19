@@ -79,13 +79,34 @@ hdfs dfs -get /lab01/sample.txt /workspace/sample-copy.txt
 
 You should see the four lines of text, and a new `workspace/sample-copy.txt` on your laptop.
 
-### 4. Look at it in the web UI
+### 4. Make your own file, upload it, add to it
+
+Real data starts on your own machine, so create a file locally first. Inside this shell, "local" means `/workspace`, which is the repo's `workspace/` folder on your laptop.
+
+```bash
+echo "This is a sample file" > /workspace/localfile.txt
+hdfs dfs -put /workspace/localfile.txt /lab01/
+echo "A second line, added later" > /workspace/more.txt
+hdfs dfs -appendToFile /workspace/more.txt /lab01/localfile.txt
+hdfs dfs -cat /lab01/localfile.txt
+```
+
+You should see:
+
+```
+This is a sample file
+A second line, added later
+```
+
+HDFS files are write-once: you can add to the end with `-appendToFile`, but you can't edit lines in the middle. To change a file, upload a new version with `hdfs dfs -put -f`.
+
+### 5. Look at it in the web UI
 
 Open <http://hdfs.localhost>, then **Utilities > Browse the file system**. Click `lab01`, then `sample.txt`. A window shows the file's size, replication and **block ID**. It also has a **Head the file** button.
 
 This is the same data you just read in the shell. The shell and the UI both ask the NameNode.
 
-### 5. Make a file that needs more than one block
+### 6. Make a file that needs more than one block
 
 The default block size is 128 MB, so a small file is always one block. To see blocks without a huge file, make a 2.6 MB file of numbers and ask HDFS for 1 MB blocks.
 
@@ -103,7 +124,7 @@ You should see a line that ends like this (`put` prints nothing when it works):
 
 `-D dfs.blocksize=1m` changes the setting for this one command only.
 
-### 6. Count the blocks with fsck
+### 7. Count the blocks with fsck
 
 `fsck` (file system check) asks the NameNode how a file is stored.
 
@@ -128,7 +149,7 @@ Three blocks: two full 1 MB blocks (`len=1048576`) and a smaller last one. The l
 
 Open the file in the web UI again. The block list now has three entries.
 
-### 7. See what is using the space
+### 8. See what is using the space
 
 `-ls -R` lists a folder and everything under it. `-du` shows the size of each file, and `-df` shows how full HDFS is.
 
@@ -164,10 +185,11 @@ You should see:
 ```
 PASS  sample.txt is in /lab01
 PASS  /lab01/sample.txt has the sample text
+PASS  localfile.txt has the appended line
 PASS  numbers.txt is in /lab01
 PASS  numbers.txt is split into 3 blocks
 
-All 4 checks passed
+All 5 checks passed
 ```
 
 A `FAIL` line comes with a hint that says which step to repeat. From your laptop's terminal, the same check is `docker compose exec namenode bash /labs/01-hdfs-basics/check.sh`.

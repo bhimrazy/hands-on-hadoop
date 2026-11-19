@@ -78,6 +78,7 @@ docker compose exec namenode bash /labs/01-hdfs-basics/check.sh
 ```text
 PASS  sample.txt is in /lab01
 PASS  /lab01/sample.txt has the sample text
+PASS  localfile.txt has the appended line
 PASS  numbers.txt is in /lab01
 PASS  numbers.txt is split into 3 blocks
 ...

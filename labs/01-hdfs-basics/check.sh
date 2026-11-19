@@ -5,6 +5,8 @@ check_hdfs_exists /lab01/sample.txt "sample.txt is in /lab01" \
   "hdfs dfs -mkdir -p /lab01 && hdfs dfs -put /labs/01-hdfs-basics/data/sample.txt /lab01/"
 check_hdfs_contains /lab01/sample.txt "namenode" "/lab01/sample.txt has the sample text" \
   "put the file again: hdfs dfs -put -f /labs/01-hdfs-basics/data/sample.txt /lab01/"
+check_hdfs_contains /lab01/localfile.txt "added later" "localfile.txt has the appended line" \
+  "step 4: put /workspace/localfile.txt, then hdfs dfs -appendToFile /workspace/more.txt /lab01/localfile.txt"
 check_hdfs_exists /lab01/numbers.txt "numbers.txt is in /lab01" \
   "hdfs dfs -D dfs.blocksize=1m -put /workspace/numbers.txt /lab01/"
 
