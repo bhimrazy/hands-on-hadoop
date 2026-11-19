@@ -81,12 +81,12 @@ You should see the four lines of text, and a new `workspace/sample-copy.txt` on 
 
 ### 4. Make your own file, upload it, add to it
 
-Real data starts on your own machine, so create a file locally first. Inside this shell, "local" means `/workspace`, which is the repo's `workspace/` folder on your laptop.
+Create a file, upload it, add a line to its end, and read it back. Run these in the namenode shell:
 
 ```bash
 echo "This is a sample file" > /workspace/localfile.txt
-hdfs dfs -put /workspace/localfile.txt /lab01/
 echo "A second line, added later" > /workspace/more.txt
+hdfs dfs -put /workspace/localfile.txt /lab01/
 hdfs dfs -appendToFile /workspace/more.txt /lab01/localfile.txt
 hdfs dfs -cat /lab01/localfile.txt
 ```
@@ -99,6 +99,41 @@ A second line, added later
 ```
 
 HDFS files are write-once: you can add to the end with `-appendToFile`, but you can't edit lines in the middle. To change a file, upload a new version with `hdfs dfs -put -f`.
+
+<details>
+<summary><b>Optional:</b> start from a file on your laptop instead</summary>
+
+<br>
+
+A file on your laptop reaches HDFS in two hops: **laptop → container → HDFS**, and comes back the same way.
+
+<img src="../../images/laptop-to-hdfs.svg" alt="A file goes from your laptop into the namenode container with docker compose cp, then into HDFS with hdfs dfs -put. It comes back with hdfs dfs -get, then docker compose cp." width="720">
+
+In a second terminal **on your laptop**, in the repo folder:
+
+```bash
+echo "Written on my laptop" > mine.txt
+docker compose cp mine.txt namenode:/tmp/mine.txt
+```
+
+On Windows PowerShell, create it with `Set-Content mine.txt "Written on my laptop"`; `echo >` there writes UTF-16.
+
+**In the namenode shell**:
+
+```bash
+hdfs dfs -put /tmp/mine.txt /lab01/
+hdfs dfs -get /lab01/mine.txt /tmp/mine-from-hdfs.txt
+```
+
+**Back on your laptop**:
+
+```bash
+docker compose cp namenode:/tmp/mine-from-hdfs.txt .
+```
+
+Files you save in the repo's `workspace/` folder skip the copy: it is mounted at `/workspace` in the container.
+
+</details>
 
 ### 5. Look at it in the web UI
 

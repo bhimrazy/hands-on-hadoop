@@ -1,0 +1,45 @@
+<svg xmlns="http://www.w3.org/2000/svg" width="800" height="262" viewBox="0 0 800 262" role="img" aria-labelledby="title desc" font-family="-apple-system, BlinkMacSystemFont, &apos;Segoe UI&apos;, Roboto, Helvetica, Arial, sans-serif">
+<title id="title">Two hops from your laptop to HDFS</title>
+<desc id="desc">mine.txt goes from your laptop to /tmp/mine.txt in the namenode container with docker compose cp, then to /lab01/mine.txt in HDFS with hdfs dfs -put. Coming back, hdfs dfs -get writes /tmp/mine-from-hdfs.txt in the container and docker compose cp copies it to the laptop. The workspace folder is shared, so files there skip the first hop.</desc>
+<style>text{font-family:-apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;fill:#1f2937}
+.t{font-size:21px;font-weight:700}
+.st{font-size:14px;fill:#5f6877}
+.h{font-size:15px;font-weight:600}
+.hs{font-size:14px;font-weight:600}
+.b{font-size:14px}
+.s{font-size:13.5px;fill:#5f6877}
+.m{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px}
+.ms{font-family:ui-monospace, SFMono-Regular, Menlo, Consolas, 'Liberation Mono', monospace;font-size:13.5px;fill:#5f6877}
+.n{font-size:13px;font-weight:700;fill:#ffffff}</style>
+<defs><filter id="sh" x="-5%" y="-5%" width="110%" height="125%"><feDropShadow dx="0" dy="1" stdDeviation="1.5" flood-color="#0f172a" flood-opacity="0.08"/></filter><marker id="a5f6877" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#5f6877"/></marker><marker id="af5b301" viewBox="0 0 10 10" refX="8.5" refY="5" markerWidth="6.5" markerHeight="6.5" orient="auto-start-reverse"><path d="M0.5 0.8 L9 5 L0.5 9.2 z" fill="#f5b301"/></marker></defs>
+<rect width="800" height="262" fill="#ffffff"/>
+<text x="32" y="44" class="t">Two hops: laptop → container → HDFS</text>
+<text x="32" y="68" class="st">hdfs commands run inside the namenode container, so a laptop file has to get there first.</text>
+<rect x="32" y="96" width="140" height="112" rx="12" fill="#ffffff" stroke="#d1d5db" stroke-width="1.5" filter="url(#sh)"/>
+<text x="48" y="122" class="h">Your laptop</text>
+<text x="48" y="141" class="s">the repo folder</text>
+<text x="48" y="170" class="ms">./</text>
+<text x="48" y="189" class="m">mine.txt</text>
+<rect x="330" y="96" width="140" height="112" rx="12" fill="#ffffff" stroke="#f5b301" stroke-width="1.5" filter="url(#sh)"/>
+<text x="346" y="122" class="h">namenode</text>
+<text x="346" y="141" class="s">container</text>
+<text x="346" y="170" class="ms">/tmp/</text>
+<text x="346" y="189" class="m">mine.txt</text>
+<rect x="628" y="96" width="140" height="112" rx="12" fill="#fff7db" stroke="#f5b301" stroke-width="1.5" filter="url(#sh)"/>
+<text x="644" y="122" class="h">HDFS</text>
+<text x="644" y="141" class="s">stored as blocks</text>
+<text x="644" y="170" class="ms">/lab01/</text>
+<text x="644" y="189" class="m">mine.txt</text>
+<rect x="708" y="111" width="12" height="12" rx="2" fill="#ffffff" stroke="#f5b301" stroke-width="1.2"/>
+<rect x="724" y="111" width="12" height="12" rx="2" fill="#ffffff" stroke="#f5b301" stroke-width="1.2"/>
+<rect x="740" y="111" width="12" height="12" rx="2" fill="#ffffff" stroke="#f5b301" stroke-width="1.2"/>
+<text x="251" y="124" class="m" text-anchor="middle">docker compose cp</text>
+<path d="M176 136 L327 136" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
+<path d="M326 170 L175 170" fill="none" stroke="#5f6877" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<text x="251" y="192" class="m" text-anchor="middle">docker compose cp</text>
+<text x="549" y="124" class="m" text-anchor="middle">hdfs dfs -put</text>
+<path d="M474 136 L625 136" fill="none" stroke="#f5b301" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#af5b301)"/>
+<path d="M624 170 L473 170" fill="none" stroke="#5f6877" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" marker-end="url(#a5f6877)"/>
+<text x="549" y="192" class="m" text-anchor="middle">hdfs dfs -get</text>
+<text x="32" y="242" class="s">Shortcut: workspace/ on your laptop is /workspace in the container, so no copy needed.</text>
+</svg>
