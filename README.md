@@ -90,11 +90,21 @@ PASS  numbers.txt is split into 3 blocks
 | Start the core | `docker compose up -d --wait` |
 | Start the core plus an add-on | `docker compose --profile notebook up -d --wait` |
 | Open a shell with `hdfs`, `yarn` and `mapred` | `docker compose exec namenode bash` |
+| Run one Hadoop command from your laptop | `docker compose exec namenode hdfs dfs -ls /` |
+| Leave the container shell | `exit` |
 | See what's running | `docker compose --profile "*" ps` |
 | Stop everything, keep data | `docker compose --profile "*" down` |
 | Stop and wipe all data | `docker compose --profile "*" down -v` |
 
 Use `--profile "*"` when stopping. A plain `down` leaves add-on containers running. Each lab's **Start** section has the exact command for that lab.
+
+Hadoop runs inside the containers, not on your laptop, and each daemon has its own container. So `jps` shows one daemon at a time. To see the four core daemons:
+
+```bash
+for s in namenode datanode resourcemanager nodemanager; do
+  docker compose exec $s jps | grep -v Jps
+done
+```
 
 ## Memory
 
